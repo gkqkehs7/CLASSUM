@@ -1,6 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { UserEntity } from '../entities/user.entity';
+import { PostEntity } from '../entities/post.entity';
+import { PostImageEntity } from '../entities/postImage.entity';
+import { ChatEntity } from '../entities/chat.entity';
+import { ReplyChatEntity } from '../entities/replyChat.entity';
+import { SpaceEntity } from '../entities/space.entity';
+import { SpaceMemberEntity } from '../entities/spaceMember.entity';
+import { SpaceRoleEntity } from '../entities/spaceRole.entity';
 
 @Injectable()
 export class TypeormConfigService implements TypeOrmOptionsFactory {
@@ -14,6 +22,16 @@ export class TypeormConfigService implements TypeOrmOptionsFactory {
       username: this.configService.get<string>('DATABASE_USERNAME'),
       password: this.configService.get<string>('DATABASE_PASSWORD'),
       database: this.configService.get<string>('DATABASE_NAME'),
+      entities: [
+        UserEntity,
+        PostEntity,
+        PostImageEntity,
+        ChatEntity,
+        ReplyChatEntity,
+        SpaceEntity,
+        SpaceMemberEntity,
+        SpaceRoleEntity,
+      ],
       synchronize: false,
     };
   }
