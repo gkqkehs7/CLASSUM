@@ -8,7 +8,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { SpaceEntity } from './space.entity';
 import { ChatEntity } from './chat.entity';
 import { UserEntity } from './user.entity';
 

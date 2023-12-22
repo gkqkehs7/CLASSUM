@@ -14,7 +14,7 @@ import { ChatEntity } from './chat.entity';
 import { UserEntity } from './user.entity';
 import { PostImageEntity } from './postImage.entity';
 
-enum PostType {
+export enum PostType {
   NOTIFICATION = 'notification',
   QUESTION = 'question',
 }
@@ -41,7 +41,7 @@ export class PostEntity {
   type: PostType;
 
   // post 익명성 여부
-  @Column('boolean')
+  @Column('boolean', { default: false })
   anonymous: boolean;
 
   // userEntity 참조 id

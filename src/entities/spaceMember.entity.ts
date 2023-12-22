@@ -1,21 +1,16 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
   DeleteDateColumn,
   UpdateDateColumn,
-  OneToMany,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { ReplyChatEntity } from './replyChat.entity';
-import { ChatEntity } from './chat.entity';
-import { PostEntity } from './post.entity';
 import { UserEntity } from './user.entity';
 import { SpaceEntity } from './space.entity';
 
-enum SpaceRoleType {
+export enum SpaceRoleType {
   ADMIN = 'admin',
   PARTICIPANT = 'participant',
 }
