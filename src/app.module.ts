@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { validationSchema } from './config/validation.schema';
 import { TypeormConfigService } from './config/typeorm.config.service';
+import { GlobalJwtModule } from './modules/jwt/jwt.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { TypeormConfigService } from './config/typeorm.config.service';
       imports: [ConfigModule],
       useClass: TypeormConfigService,
     }),
+    GlobalJwtModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
