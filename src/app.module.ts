@@ -7,6 +7,7 @@ import { validationSchema } from './config/validation.schema';
 import { TypeormConfigService } from './config/typeorm.config.service';
 import { GlobalJwtModule } from './modules/jwt/jwt.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     GlobalJwtModule,
     AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

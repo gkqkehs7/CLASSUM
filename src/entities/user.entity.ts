@@ -25,6 +25,10 @@ export class UserEntity {
   @Column('varchar', { unique: true })
   email: string;
 
+  // user 비밀번호
+  @Column('varchar')
+  password: string;
+
   // user 이름
   @Column('varchar')
   firstName: string;
