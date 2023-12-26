@@ -216,6 +216,27 @@ export class SpacesController {
     return new SuccessResponseDto(response);
   }
 
+  @ApiOperation({
+    summary: 'chat 삭제',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Delete('/space/:spaceId/post/:postId/chat/:chatId')
+  async deleteChat(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+    @Param('chatId') chatId: string,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.chatsService.deleteChat(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      parseInt(request.postId),
+      parseInt(request.chatId),
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
   // replyChats
   @ApiOperation({
     summary: 'replyChat 생성',
