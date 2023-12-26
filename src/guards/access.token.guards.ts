@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -13,13 +8,13 @@ export class AccessTokenGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
 
-    const accessToken = request.headers['access-token'];
+    const authorization = request.headers['authorization'];
 
-    if (!accessToken) {
+    if (!authorization) {
       throw new Error('No accessToken in header');
     }
 
-    const [type, token] = accessToken.split(' ');
+    const [type, token] = authorization.split(' ');
 
     if (type !== 'Bearer') {
       throw new Error('Invalid accessToken');

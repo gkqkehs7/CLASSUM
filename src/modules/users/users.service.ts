@@ -13,10 +13,10 @@ export class UsersService {
   ) {}
 
   /**
-   * 존재하는 유저인지 확인
+   * 존재하는 유저인지 email로 확인
    * @param email
    */
-  async userExists(email: string): Promise<boolean> {
+  async userExistsByEmail(email: string): Promise<boolean> {
     const isExist = await this.userRepository.findOne({
       where: { email: email },
     });
@@ -26,7 +26,7 @@ export class UsersService {
   }
 
   /**
-   * 이메일로 유저 검색
+   * email로 유저 검색
    * @param email
    */
   async findUserByEmail(email: string): Promise<User> {

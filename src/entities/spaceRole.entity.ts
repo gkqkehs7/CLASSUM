@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { SpaceEntity } from './space.entity';
 
-enum SpaceRoleType {
+export enum SpaceRoleType {
   ADMIN = 'admin',
   PARTICIPANT = 'participant',
 }

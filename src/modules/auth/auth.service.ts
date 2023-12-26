@@ -46,7 +46,7 @@ export class AuthService {
       signUpRequestDto;
 
     // 해당 이메일로 가입한 유저가 존재하는지 확인
-    const isExist = await this.usersService.userExists(email);
+    const isExist = await this.usersService.userExistsByEmail(email);
 
     if (isExist) {
       throw new Error('이미 가입된 유저입니다.');
