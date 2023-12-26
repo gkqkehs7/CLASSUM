@@ -23,8 +23,10 @@ import { CreatePostRequestDto } from './request.dto/create.post.request.dto';
 import { PostType } from '../../entities/post.entity';
 import { PostsService } from '../posts/posts.service';
 import { SuccessResponseDto } from '../dto/success.response.dto';
-import { CreateChatRequestDto } from '../chat/dto/create.chat.request.dto';
 import { ChatsService } from '../chat/chats.service';
+import { ReplyChatsService } from '../reply.chats/reply.chats.service';
+import { CreateChatRequestDto } from './request.dto/create.chat.request.dto';
+import { CreateReplyChatRequestDto } from './request.dto/create.reply.chat.request.dto';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -34,6 +36,7 @@ export class SpacesController {
     private spaceRolesService: SpaceRolesService,
     private postsService: PostsService,
     private chatsService: ChatsService,
+    private replyChatsService: ReplyChatsService,
   ) {}
 
   @ApiOperation({
@@ -208,6 +211,29 @@ export class SpacesController {
       parseInt(request.spaceId),
       parseInt(request.postId),
       createChatRequestDto,
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: 'replyChat 삭제',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Delete('/space/:spaceId/post/:postId/chat/:chatId/replyChat/:replyChatId')
+  async createReplyChat(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+    @Param('chatId') chatId: string,
+    @Param('replyChatId') replyChatId: string,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.replyChatsService.deleteReplyChat(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      parseInt(request.postId),
+      parseInt(request.chatId),
+      parseInt(request.replyChatId),
     );
 
     return new SuccessResponseDto(response);

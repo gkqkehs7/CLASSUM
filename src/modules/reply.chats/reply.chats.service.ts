@@ -5,11 +5,12 @@ import { Repository } from 'typeorm';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity } from '../../entities/post.entity';
 import { ChatEntity } from '../../entities/chat.entity';
+import { CreateReplyChatRequestDto } from '../spaces/request.dto/create.reply.chat.request.dto';
+import { ReplyChatEntity } from '../../entities/replyChat.entity';
 import { SuccessResponse } from '../../types/common.types';
-import { CreateChatRequestDto } from '../spaces/request.dto/create.chat.request.dto';
 
 @Injectable()
-export class ChatsService {
+export class ReplyChatsService {
   constructor(
     @InjectRepository(SpaceEntity)
     private spaceRepository: Repository<SpaceEntity>,
@@ -19,13 +20,16 @@ export class ChatsService {
     private postEntityRepository: Repository<PostEntity>,
     @InjectRepository(ChatEntity)
     private chatEntityRepository: Repository<ChatEntity>,
+    @InjectRepository(ReplyChatEntity)
+    private replyChatEntityRepository: Repository<ReplyChatEntity>,
   ) {}
 
-  async createChat(
+  async createReplyChat(
     userId: number,
     spaceId: number,
     postId: number,
-    createChatRequestDto: CreateChatRequestDto,
+    chatId: number,
+    createReplyChatRequestDto: CreateReplyChatRequestDto,
   ): Promise<SuccessResponse> {
     const space = await this.spaceRepository.findOne({
       where: { id: spaceId },
@@ -51,15 +55,51 @@ export class ChatsService {
       throw new Error('존재하지 않는 게시글입니다.');
     }
 
-    const { content, anonymous } = createChatRequestDto;
+    const { content, anonymous } = createReplyChatRequestDto;
 
-    const chat = new ChatEntity();
-    chat.content = content;
-    chat.anonymous = anonymous;
-    chat.userId = userId;
-    chat.postId = postId;
+    const replyChat = new ReplyChatEntity();
+    replyChat.content = content;
+    replyChat.anonymous = anonymous;
+    replyChat.userId = userId;
+    replyChat.chatId = postId;
 
-    await this.chatEntityRepository.save(chat);
+    await this.replyChatEntityRepository.save(replyChat);
+
+    return { success: true };
+  }
+
+  async deleteReplyChat(
+    userId: number,
+    spaceId: number,
+    postId: number,
+    chatId: number,
+    replyChatId: number,
+  ): Promise<SuccessResponse> {
+    const post = await this.postEntityRepository.findOne({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new Error('존재하지 않는 게시글입니다.');
+    }
+
+    const chat = await this.chatEntityRepository.findOne({
+      where: { id: chatId },
+    });
+
+    if (!chat) {
+      throw new Error('존재하지 않는 댓글입니다.');
+    }
+
+    const replyChat = await this.replyChatEntityRepository.findOne({
+      where: { id: replyChatId },
+    });
+
+    if (!replyChat) {
+      throw new Error('존재하지 않는 답글입니다.');
+    }
+
+    await this.replyChatEntityRepository.softRemove(replyChat);
 
     return { success: true };
   }
