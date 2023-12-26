@@ -8,6 +8,8 @@ import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { UsersModule } from '../users/users.module';
 import { SpaceRolesModule } from '../spaceRole/spaceRoles.module';
 import { UserEntity } from '../../entities/user.entity';
+import { PostsModule } from '../posts/posts.module';
+import { PostEntity } from '../../entities/post.entity';
 
 @Module({
   imports: [
@@ -16,9 +18,11 @@ import { UserEntity } from '../../entities/user.entity';
       SpaceEntity,
       SpaceRoleEntity,
       SpaceMemberEntity,
+      PostEntity,
     ]),
     UsersModule,
     SpaceRolesModule,
+    PostsModule,
   ],
   controllers: [SpacesController],
   providers: [SpacesService],

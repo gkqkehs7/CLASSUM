@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { SpacesModule } from './modules/spaces/spaces.module';
 import { SpaceRolesModule } from './modules/spaceRole/spaceRoles.module';
+import { PostsModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { SpaceRolesModule } from './modules/spaceRole/spaceRoles.module';
     UsersModule,
     SpacesModule,
     SpaceRolesModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

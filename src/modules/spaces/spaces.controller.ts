@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -13,15 +14,15 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SpacesService } from './spaces.service';
 import { AccessTokenGuard } from '../../guards/access.token.guards';
 import { CreateSpaceRequestDto } from './request.dto/create.space.request.dto';
-import { CreateSpaceResponseDto } from './response.dto/create.space.response.dto';
 import { UpdateUserSpaceRoleRequestDto } from './request.dto/update.user.space.role.request.dto';
-import { UpdateUserSpaceRoleResponseDto } from './response.dto/update.user.space.role.response.dto';
 import { SpaceRolesService } from '../spaceRole/spaceRoles.service';
-import { DeleteSpaceResponseDto } from './response.dto/delete.space.response.dto';
 import { DeleteSpaceRoleRequestDto } from './request.dto/delete.space.role.request.dto';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
-import { EntranceSpaceResponseDto } from './response.dto/entrance.space.response.dto';
 import { GetMySpacesResponseDto } from './response.dto/get.my.spaces.response.dto';
+import { CreatePostRequestDto } from './request.dto/create.post.request.dto';
+import { PostType } from '../../entities/post.entity';
+import { PostsService } from '../posts/posts.service';
+import { SuccessResponseDto } from '../dto/success.response.dto';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -29,6 +30,7 @@ export class SpacesController {
   constructor(
     private spacesService: SpacesService,
     private spaceRolesService: SpaceRolesService,
+    private postsService: PostsService,
   ) {}
 
   @ApiOperation({
@@ -39,13 +41,13 @@ export class SpacesController {
   async createSpace(
     @Req() request,
     @Body() createSpaceRequestDto: CreateSpaceRequestDto,
-  ): Promise<CreateSpaceResponseDto> {
+  ): Promise<SuccessResponseDto> {
     const response = await this.spacesService.createSpace(
       parseInt(request.userId),
       createSpaceRequestDto,
     );
 
-    return new CreateSpaceResponseDto(response);
+    return new SuccessResponseDto(response);
   }
 
   @ApiOperation({
@@ -69,13 +71,13 @@ export class SpacesController {
   async deleteSpace(
     @Req() request,
     @Param('spaceId') spaceId: string,
-  ): Promise<DeleteSpaceResponseDto> {
+  ): Promise<SuccessResponseDto> {
     const response = await this.spacesService.deleteSpace(
       parseInt(request.userId),
       parseInt(spaceId),
     );
 
-    return new DeleteSpaceResponseDto(response);
+    return new SuccessResponseDto(response);
   }
 
   @ApiOperation({
@@ -87,14 +89,14 @@ export class SpacesController {
     @Req() request,
     @Param('spaceId') spaceId: string,
     @Body() entranceSpaceRequestDto: EntranceSpaceRequestDto,
-  ): Promise<EntranceSpaceResponseDto> {
+  ): Promise<SuccessResponseDto> {
     const response = await this.spacesService.entranceSpace(
       parseInt(request.userId),
       parseInt(spaceId),
       entranceSpaceRequestDto,
     );
 
-    return new EntranceSpaceResponseDto(response);
+    return new SuccessResponseDto(response);
   }
 
   @ApiOperation({
@@ -106,14 +108,14 @@ export class SpacesController {
     @Req() request,
     @Param('spaceId') spaceId: string,
     @Body() deleteSpaceRoleRequestDto: DeleteSpaceRoleRequestDto,
-  ): Promise<UpdateUserSpaceRoleResponseDto> {
+  ): Promise<SuccessResponseDto> {
     const response = await this.spaceRolesService.deleteSpaceRole(
       parseInt(request.userId),
       parseInt(spaceId),
       deleteSpaceRoleRequestDto,
     );
 
-    return new UpdateUserSpaceRoleResponseDto(response);
+    return new SuccessResponseDto(response);
   }
 
   @ApiOperation({
@@ -126,7 +128,7 @@ export class SpacesController {
     @Param('userId') userId: string,
     @Param('spaceId') spaceId: string,
     @Body() updateUserSpaceRoleRequestDto: UpdateUserSpaceRoleRequestDto,
-  ): Promise<UpdateUserSpaceRoleResponseDto> {
+  ): Promise<SuccessResponseDto> {
     const response = await this.spaceRolesService.updateUserSpaceRole(
       parseInt(request.userId),
       parseInt(userId),
@@ -134,6 +136,55 @@ export class SpacesController {
       updateUserSpaceRoleRequestDto,
     );
 
-    return new UpdateUserSpaceRoleResponseDto(response);
+    return new SuccessResponseDto(response);
+  }
+
+  // posts
+  @ApiOperation({
+    summary: 'post 생성',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/space/:spaceId/post')
+  async createPost(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Query() query,
+    @Body() createPostRequestDto: CreatePostRequestDto,
+  ): Promise<SuccessResponseDto> {
+    if (
+      query.postType !== PostType.NOTIFICATION ||
+      query.postType !== PostType.QUESTION
+    ) {
+      throw new Error('잘못된 쿼리 형식입니다.');
+    }
+
+    const response = await this.postsService.createPost(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      query.postType,
+      createPostRequestDto,
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
+  // posts
+  @ApiOperation({
+    summary: 'post 삭제',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/space/:spaceId/post/:postId')
+  async deletePost(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.postsService.deletePost(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      parseInt(request.postId),
+    );
+
+    return new SuccessResponseDto(response);
   }
 }
