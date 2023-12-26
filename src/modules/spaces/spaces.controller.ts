@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -22,6 +23,9 @@ import { DeleteSpaceRoleRequestDto } from './request.dto/delete.space.role.reque
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
 import { EntranceSpaceResponseDto } from './response.dto/entrance.space.response.dto';
 import { GetMySpacesResponseDto } from './response.dto/get.my.spaces.response.dto';
+import { CreatePostRequestDto } from './request.dto/create.post.request.dto';
+import { PostType } from '../../entities/post.entity';
+import { PostsService } from '../posts/posts.service';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -29,6 +33,7 @@ export class SpacesController {
   constructor(
     private spacesService: SpacesService,
     private spaceRolesService: SpaceRolesService,
+    private postsService: PostsService,
   ) {}
 
   @ApiOperation({
@@ -135,5 +140,32 @@ export class SpacesController {
     );
 
     return new UpdateUserSpaceRoleResponseDto(response);
+  }
+
+  // posts
+  @ApiOperation({
+    summary: 'post 생성',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/space/:spaceId/post')
+  async createPost(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Query() query,
+    @Body() createPostRequestDto: CreatePostRequestDto,
+  ) {
+    if (
+      query.postType !== PostType.NOTIFICATION ||
+      query.postType !== PostType.QUESTION
+    ) {
+      throw new Error('잘못된 쿼리 형식입니다.');
+    }
+
+    const response = await this.postsService.createPost(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      query.postType,
+      createPostRequestDto,
+    );
   }
 }
