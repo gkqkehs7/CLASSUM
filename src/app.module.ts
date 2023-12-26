@@ -8,6 +8,8 @@ import { TypeormConfigService } from './config/typeorm.config.service';
 import { GlobalJwtModule } from './modules/jwt/jwt.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { SpacesModule } from './modules/spaces/spaces.module';
+import { SpaceRoleModule } from './space-role/space-role.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { UsersModule } from './modules/users/users.module';
     GlobalJwtModule,
     AuthModule,
     UsersModule,
+    SpacesModule,
+    SpaceRoleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

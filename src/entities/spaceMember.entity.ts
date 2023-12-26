@@ -9,11 +9,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { SpaceEntity } from './space.entity';
-
-export enum SpaceRoleType {
-  ADMIN = 'admin',
-  PARTICIPANT = 'participant',
-}
+import { SpaceRoleType } from './spaceRole.entity';
 
 @Entity({ name: 'SpaceMember' })
 export class SpaceMemberEntity {
