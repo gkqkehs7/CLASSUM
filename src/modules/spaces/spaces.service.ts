@@ -20,6 +20,7 @@ import { SpaceRolesService } from '../spaceRole/spaceRoles.service';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
 import { UserEntity } from '../../entities/user.entity';
 import { ModelConverter } from '../../types/model.converter';
+import { SuccessResponse } from '../../types/common.types';
 
 @Injectable()
 export class SpacesService {
@@ -45,7 +46,7 @@ export class SpacesService {
   async createSpace(
     userId: number,
     createSpaceRequestDto: CreateSpaceRequestDto,
-  ): Promise<CreateSpaceReponse> {
+  ): Promise<SuccessResponse> {
     const { name, logo, code, adminCode, roleNames } = createSpaceRequestDto;
 
     const queryRunner = await this.connection.createQueryRunner();
@@ -111,10 +112,7 @@ export class SpacesService {
    * @param userId
    * @param spaceId
    */
-  async deleteSpace(
-    userId: number,
-    spaceId: number,
-  ): Promise<DeleteSpaceResponse> {
+  async deleteSpace(userId: number, spaceId: number): Promise<SuccessResponse> {
     const space = await this.spaceRepository.findOne({
       where: { id: spaceId },
       relations: ['posts', 'spaceRoles'],
@@ -145,7 +143,7 @@ export class SpacesService {
     userId: number,
     spaceId: number,
     entranceSpaceRequestDto: EntranceSpaceRequestDto,
-  ): Promise<EntranceSpaceResponse> {
+  ): Promise<SuccessResponse> {
     const { entranceCode } = entranceSpaceRequestDto;
 
     const space = await this.spaceRepository.findOne({
@@ -187,7 +185,7 @@ export class SpacesService {
   async addSpaceMember(
     createSpaceMemberDAO: CreateSpaceMemberDAO,
     queryRunner: QueryRunner,
-  ): Promise<void> {
+  ): Promise<SuccessResponse> {
     const { userId, spaceId, roleName, roleType } = createSpaceMemberDAO;
 
     const spaceMember = new SpaceMemberEntity();
@@ -200,5 +198,7 @@ export class SpacesService {
     await queryRunner.manager
       .getRepository(SpaceMemberEntity)
       .save(spaceMember);
+
+    return { success: true };
   }
 }

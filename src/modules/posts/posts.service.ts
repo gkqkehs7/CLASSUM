@@ -9,6 +9,7 @@ import {
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity, PostType } from '../../entities/post.entity';
 import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
+import { SuccessResponse } from '../../types/common.types';
 
 @Injectable()
 export class PostsService {
@@ -28,7 +29,7 @@ export class PostsService {
     spaceId: number,
     postType: PostType,
     createPostRequestDto: CreatePostRequestDto,
-  ) {
+  ): Promise<SuccessResponse> {
     const space = await this.spaceRepository.findOne({
       where: { id: spaceId },
       relations: ['posts', 'spaceRoles'],
