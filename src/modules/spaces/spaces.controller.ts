@@ -174,7 +174,25 @@ export class SpacesController {
     return new SuccessResponseDto(response);
   }
 
-  // posts
+  @ApiOperation({
+    summary: 'post 가져오기',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/space/:spaceId/post/:postId')
+  async getPost(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.postsService.getPost(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      parseInt(request.postId),
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
   @ApiOperation({
     summary: 'post 삭제',
   })

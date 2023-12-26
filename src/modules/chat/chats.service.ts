@@ -15,11 +15,11 @@ export class ChatsService {
     @InjectRepository(SpaceEntity)
     private spaceRepository: Repository<SpaceEntity>,
     @InjectRepository(SpaceMemberEntity)
-    private spaceMemberEntityRepository: Repository<SpaceMemberEntity>,
+    private spaceMemberRepository: Repository<SpaceMemberEntity>,
     @InjectRepository(PostEntity)
-    private postEntityRepository: Repository<PostEntity>,
+    private postRepository: Repository<PostEntity>,
     @InjectRepository(ChatEntity)
-    private chatEntityRepository: Repository<ChatEntity>,
+    private chatRepository: Repository<ChatEntity>,
   ) {}
 
   /**
@@ -43,7 +43,7 @@ export class ChatsService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -51,7 +51,7 @@ export class ChatsService {
       throw new Error('space 멤버만 댓글을 작성할 수 있습니다.');
     }
 
-    const post = await this.postEntityRepository.findOne({
+    const post = await this.postRepository.findOne({
       where: { id: postId },
     });
 
@@ -67,7 +67,7 @@ export class ChatsService {
     chat.userId = userId;
     chat.postId = postId;
 
-    await this.chatEntityRepository.save(chat);
+    await this.chatRepository.save(chat);
 
     return { success: true };
   }
@@ -93,7 +93,7 @@ export class ChatsService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const chat = await this.chatEntityRepository.findOne({
+    const chat = await this.chatRepository.findOne({
       where: { id: chatId },
       relations: ['replyChats'],
     });
@@ -102,7 +102,7 @@ export class ChatsService {
       throw new Error('존재하지 않는 chat 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -112,7 +112,7 @@ export class ChatsService {
       throw new Error('작성자나 관리자만 댓글을 삭제할 수 있습니다.');
     }
 
-    await this.chatEntityRepository.softRemove(chat);
+    await this.chatRepository.softRemove(chat);
 
     return { success: true };
   }

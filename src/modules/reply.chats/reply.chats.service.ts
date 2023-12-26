@@ -15,13 +15,13 @@ export class ReplyChatsService {
     @InjectRepository(SpaceEntity)
     private spaceRepository: Repository<SpaceEntity>,
     @InjectRepository(SpaceMemberEntity)
-    private spaceMemberEntityRepository: Repository<SpaceMemberEntity>,
+    private spaceMemberRepository: Repository<SpaceMemberEntity>,
     @InjectRepository(PostEntity)
-    private postEntityRepository: Repository<PostEntity>,
+    private postRepository: Repository<PostEntity>,
     @InjectRepository(ChatEntity)
-    private chatEntityRepository: Repository<ChatEntity>,
+    private chatRepository: Repository<ChatEntity>,
     @InjectRepository(ReplyChatEntity)
-    private replyChatEntityRepository: Repository<ReplyChatEntity>,
+    private replyChatRepository: Repository<ReplyChatEntity>,
   ) {}
 
   async createReplyChat(
@@ -39,7 +39,7 @@ export class ReplyChatsService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -47,7 +47,7 @@ export class ReplyChatsService {
       throw new Error('space 멤버만 댓글을 작성할 수 있습니다.');
     }
 
-    const post = await this.postEntityRepository.findOne({
+    const post = await this.postRepository.findOne({
       where: { id: postId },
     });
 
@@ -63,7 +63,7 @@ export class ReplyChatsService {
     replyChat.userId = userId;
     replyChat.chatId = postId;
 
-    await this.replyChatEntityRepository.save(replyChat);
+    await this.replyChatRepository.save(replyChat);
 
     return { success: true };
   }
@@ -75,7 +75,7 @@ export class ReplyChatsService {
     chatId: number,
     replyChatId: number,
   ): Promise<SuccessResponse> {
-    const post = await this.postEntityRepository.findOne({
+    const post = await this.postRepository.findOne({
       where: { id: postId },
     });
 
@@ -83,7 +83,7 @@ export class ReplyChatsService {
       throw new Error('존재하지 않는 게시글입니다.');
     }
 
-    const chat = await this.chatEntityRepository.findOne({
+    const chat = await this.chatRepository.findOne({
       where: { id: chatId },
     });
 
@@ -91,7 +91,7 @@ export class ReplyChatsService {
       throw new Error('존재하지 않는 댓글입니다.');
     }
 
-    const replyChat = await this.replyChatEntityRepository.findOne({
+    const replyChat = await this.replyChatRepository.findOne({
       where: { id: replyChatId },
     });
 
@@ -99,7 +99,7 @@ export class ReplyChatsService {
       throw new Error('존재하지 않는 답글입니다.');
     }
 
-    await this.replyChatEntityRepository.softRemove(replyChat);
+    await this.replyChatRepository.softRemove(replyChat);
 
     return { success: true };
   }

@@ -19,9 +19,9 @@ export class PostsService {
     @InjectRepository(SpaceRoleEntity)
     private spaceRoleRepository: Repository<SpaceRoleEntity>,
     @InjectRepository(SpaceRoleEntity)
-    private spaceMemberEntityRepository: Repository<SpaceMemberEntity>,
+    private spaceMemberRepository: Repository<SpaceMemberEntity>,
     @InjectRepository(PostEntity)
-    private postEntityRepository: Repository<PostEntity>,
+    private postRepository: Repository<PostEntity>,
   ) {}
 
   async createPost(
@@ -38,7 +38,7 @@ export class PostsService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -65,9 +65,24 @@ export class PostsService {
     post.userId = userId;
     post.spaceId = spaceId;
 
-    await this.postEntityRepository.save(post);
+    await this.postRepository.save(post);
 
     return { success: true };
+  }
+
+  async getPost(userId: number, spaceId: number, postId: number) {
+    const space = await this.spaceRepository.findOne({
+      where: { id: spaceId },
+    });
+
+    if (!space) {
+      throw new Error('존재하지 않는 space 입니다.');
+    }
+
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: ['chats'],
+    });
   }
 
   async deletePost(
@@ -83,7 +98,7 @@ export class PostsService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -93,7 +108,7 @@ export class PostsService {
       throw new Error('관리자만 공지글을 삭제할 수 있습니다.');
     }
 
-    const post = await this.postEntityRepository.findOne({
+    const post = await this.postRepository.findOne({
       where: { id: postId },
       relations: ['chats', 'images'],
     });
@@ -102,7 +117,7 @@ export class PostsService {
       throw new Error('존재하지 않는 post 입니다.');
     }
 
-    await this.postEntityRepository.softRemove(post);
+    await this.postRepository.softRemove(post);
 
     return { success: true };
   }

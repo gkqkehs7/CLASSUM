@@ -23,7 +23,7 @@ export class SpaceRolesService {
     @InjectRepository(SpaceRoleEntity)
     private spaceRoleRepository: Repository<SpaceRoleEntity>,
     @InjectRepository(SpaceRoleEntity)
-    private spaceMemberEntityRepository: Repository<SpaceMemberEntity>,
+    private spaceMemberRepository: Repository<SpaceMemberEntity>,
   ) {}
 
   /**
@@ -67,7 +67,7 @@ export class SpaceRolesService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -85,7 +85,7 @@ export class SpaceRolesService {
       throw new Error('존재하지 않는 spaceRole 입니다.');
     }
 
-    const isUsed = await this.spaceMemberEntityRepository.findOne({
+    const isUsed = await this.spaceMemberRepository.findOne({
       where: { spaceId: spaceId, roleName: roleName },
     });
 
@@ -125,7 +125,7 @@ export class SpaceRolesService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -146,7 +146,7 @@ export class SpaceRolesService {
       }
     }
 
-    const changeMember = await this.spaceMemberEntityRepository.findOne({
+    const changeMember = await this.spaceMemberRepository.findOne({
       where: { userId: chageUserId, spaceId: spaceId },
     });
 
@@ -157,7 +157,7 @@ export class SpaceRolesService {
     changeMember.roleName = roleName;
     changeMember.roleType = roleType;
 
-    await this.spaceMemberEntityRepository.save(changeMember);
+    await this.spaceMemberRepository.save(changeMember);
 
     return { success: true };
   }
