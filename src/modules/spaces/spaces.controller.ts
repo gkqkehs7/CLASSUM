@@ -216,12 +216,36 @@ export class SpacesController {
     return new SuccessResponseDto(response);
   }
 
+  // replyChats
+  @ApiOperation({
+    summary: 'replyChat 생성',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/space/:spaceId/post/:postId/chat/:chatId/replyChat')
+  async createReplyChat(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+    @Param('chatId') chatId: string,
+    @Body() createReplyChatRequestDto: CreateReplyChatRequestDto,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.replyChatsService.createReplyChat(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      parseInt(request.postId),
+      parseInt(request.chatId),
+      createReplyChatRequestDto,
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
   @ApiOperation({
     summary: 'replyChat 삭제',
   })
   @UseGuards(AccessTokenGuard)
   @Delete('/space/:spaceId/post/:postId/chat/:chatId/replyChat/:replyChatId')
-  async createReplyChat(
+  async deleteReplyChat(
     @Req() request,
     @Param('spaceId') spaceId: string,
     @Param('postId') postId: string,
