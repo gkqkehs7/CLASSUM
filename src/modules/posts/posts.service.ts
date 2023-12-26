@@ -32,7 +32,6 @@ export class PostsService {
   ): Promise<SuccessResponse> {
     const space = await this.spaceRepository.findOne({
       where: { id: spaceId },
-      relations: ['posts', 'spaceRoles'],
     });
 
     if (!space) {
@@ -78,7 +77,6 @@ export class PostsService {
   ): Promise<SuccessResponse> {
     const space = await this.spaceRepository.findOne({
       where: { id: spaceId },
-      relations: ['posts', 'spaceRoles'],
     });
 
     if (!space) {

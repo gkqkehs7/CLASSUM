@@ -23,6 +23,8 @@ import { CreatePostRequestDto } from './request.dto/create.post.request.dto';
 import { PostType } from '../../entities/post.entity';
 import { PostsService } from '../posts/posts.service';
 import { SuccessResponseDto } from '../dto/success.response.dto';
+import { CreateChatRequestDto } from '../chat/dto/create.chat.request.dto';
+import { ChatsService } from '../chat/chats.service';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -31,6 +33,7 @@ export class SpacesController {
     private spacesService: SpacesService,
     private spaceRolesService: SpaceRolesService,
     private postsService: PostsService,
+    private chatsService: ChatsService,
   ) {}
 
   @ApiOperation({
@@ -183,6 +186,28 @@ export class SpacesController {
       parseInt(request.userId),
       parseInt(request.spaceId),
       parseInt(request.postId),
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
+  // chats
+  @ApiOperation({
+    summary: 'chat 생성',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/space/:spaceId/post/:postId/chat')
+  async createChat(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+    @Body() createChatRequestDto: CreateChatRequestDto,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.chatsService.createChat(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      parseInt(request.postId),
+      createChatRequestDto,
     );
 
     return new SuccessResponseDto(response);
