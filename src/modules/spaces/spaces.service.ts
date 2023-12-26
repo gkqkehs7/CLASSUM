@@ -13,14 +13,19 @@ import {
   CreateSpaceReponse,
   DeleteSpaceResponse,
   EntranceSpaceResponse,
+  Space,
 } from '../../types/spaces.types';
 import { UsersService } from '../users/users.service';
 import { SpaceRolesService } from '../spaceRole/spaceRoles.service';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
+import { UserEntity } from '../../entities/user.entity';
+import { ModelConverter } from '../../types/model.converter';
 
 @Injectable()
 export class SpacesService {
   constructor(
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
     @InjectRepository(SpaceEntity)
     private spaceRepository: Repository<SpaceEntity>,
     @InjectRepository(SpaceRoleEntity)
@@ -90,10 +95,15 @@ export class SpacesService {
     }
   }
 
-  async getSpaces(userId: number) {
-    const spaces = await this.spaceMemberEntityRepository.find({
-      where: { userId: userId },
+  async getSpaces(userId: number): Promise<Space[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['spaces'],
     });
+
+    if (user.spaces.length === 0) return [];
+
+    return user.spaces.map((space) => ModelConverter.space(space));
   }
 
   /**

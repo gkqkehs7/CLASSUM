@@ -21,6 +21,7 @@ import { DeleteSpaceResponseDto } from './response.dto/delete.space.response.dto
 import { DeleteSpaceRoleRequestDto } from './request.dto/delete.space.role.request.dto';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
 import { EntranceSpaceResponseDto } from './response.dto/entrance.space.response.dto';
+import { GetMySpacesResponseDto } from './response.dto/get.my.spaces.response.dto';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -51,11 +52,13 @@ export class SpacesController {
     summary: '내가 참여하고 있는 space 가져오기',
   })
   @UseGuards(AccessTokenGuard)
-  @Get('/')
-  async getSpaces(@Req() request) {
+  @Get('/me')
+  async getSpaces(@Req() request): Promise<GetMySpacesResponseDto> {
     const response = await this.spacesService.getSpaces(
       parseInt(request.userId),
     );
+
+    return new GetMySpacesResponseDto(response);
   }
 
   @ApiOperation({

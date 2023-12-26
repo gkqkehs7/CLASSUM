@@ -9,7 +9,7 @@ import { GlobalJwtModule } from './modules/jwt/jwt.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { SpacesModule } from './modules/spaces/spaces.module';
-import { SpaceRoleModule } from './space-role/space-role.module';
+import { SpaceRolesModule } from './modules/spaceRole/spaceRoles.module';
 
 @Module({
   imports: [
@@ -26,7 +26,7 @@ import { SpaceRoleModule } from './space-role/space-role.module';
     AuthModule,
     UsersModule,
     SpacesModule,
-    SpaceRoleModule,
+    SpaceRolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

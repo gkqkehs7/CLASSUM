@@ -7,10 +7,16 @@ import { SpaceRoleEntity } from '../../entities/spaceRole.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { UsersModule } from '../users/users.module';
 import { SpaceRolesModule } from '../spaceRole/spaceRoles.module';
+import { UserEntity } from '../../entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SpaceEntity, SpaceRoleEntity, SpaceMemberEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      SpaceEntity,
+      SpaceRoleEntity,
+      SpaceMemberEntity,
+    ]),
     UsersModule,
     SpaceRolesModule,
   ],
