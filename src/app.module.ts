@@ -11,6 +11,7 @@ import { UsersModule } from './modules/users/users.module';
 import { SpacesModule } from './modules/spaces/spaces.module';
 import { SpaceRolesModule } from './modules/spaceRole/spaceRoles.module';
 import { PostsModule } from './modules/posts/posts.module';
+import { ChatsModule } from './modules/chat/chats.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PostsModule } from './modules/posts/posts.module';
     SpacesModule,
     SpaceRolesModule,
     PostsModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

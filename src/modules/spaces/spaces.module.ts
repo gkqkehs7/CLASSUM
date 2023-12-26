@@ -10,6 +10,7 @@ import { SpaceRolesModule } from '../spaceRole/spaceRoles.module';
 import { UserEntity } from '../../entities/user.entity';
 import { PostsModule } from '../posts/posts.module';
 import { PostEntity } from '../../entities/post.entity';
+import { ChatsModule } from '../chat/chats.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PostEntity } from '../../entities/post.entity';
     UsersModule,
     SpaceRolesModule,
     PostsModule,
+    ChatsModule,
   ],
   controllers: [SpacesController],
   providers: [SpacesService],

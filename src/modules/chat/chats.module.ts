@@ -1,23 +1,23 @@
 import { Module } from '@nestjs/common';
-import { PostsService } from './posts.service';
+import { ChatsService } from './chats.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../entities/user.entity';
 import { SpaceEntity } from '../../entities/space.entity';
-import { SpaceRoleEntity } from '../../entities/spaceRole.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity } from '../../entities/post.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ChatEntity } from '../../entities/chat.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       UserEntity,
       SpaceEntity,
-      SpaceRoleEntity,
       SpaceMemberEntity,
       PostEntity,
+      ChatEntity,
     ]),
   ],
-  exports: [PostsService],
-  providers: [PostsService],
+  exports: [ChatsService],
+  providers: [ChatsService],
 })
-export class PostsModule {}
+export class ChatsModule {}
