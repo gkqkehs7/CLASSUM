@@ -70,4 +70,42 @@ export class PostsService {
 
     return { success: true };
   }
+
+  async deletePost(
+    userId: number,
+    spaceId: number,
+    postId: number,
+  ): Promise<SuccessResponse> {
+    const space = await this.spaceRepository.findOne({
+      where: { id: spaceId },
+      relations: ['posts', 'spaceRoles'],
+    });
+
+    if (!space) {
+      throw new Error('존재하지 않는 space 입니다.');
+    }
+
+    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+      where: { userId: userId, spaceId: spaceId },
+    });
+
+    const role = spaceMember.roleType;
+
+    if (role !== SpaceRoleType.ADMIN) {
+      throw new Error('관리자만 공지글을 삭제할 수 있습니다.');
+    }
+
+    const post = await this.postEntityRepository.findOne({
+      where: { id: postId },
+      relations: ['chats', 'images'],
+    });
+
+    if (!post) {
+      throw new Error('존재하지 않는 post 입니다.');
+    }
+
+    await this.postEntityRepository.softRemove(post);
+
+    return { success: true };
+  }
 }

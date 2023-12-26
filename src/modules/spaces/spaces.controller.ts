@@ -167,4 +167,24 @@ export class SpacesController {
 
     return new SuccessResponseDto(response);
   }
+
+  // posts
+  @ApiOperation({
+    summary: 'post 삭제',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/space/:spaceId/post/:postId')
+  async deletePost(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.postsService.deletePost(
+      parseInt(request.userId),
+      parseInt(request.spaceId),
+      parseInt(request.postId),
+    );
+
+    return new SuccessResponseDto(response);
+  }
 }
