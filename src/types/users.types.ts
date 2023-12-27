@@ -1,18 +1,13 @@
-type User = {
-  id: number;
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  profileImageSrc: string;
-};
+import { UserEntity } from '../entities/user.entity';
 
-type CreateUserDAO = {
+interface User extends UserEntity {}
+
+interface CreateUserDAO {
   email: string;
   hashedPassword: string;
   firstName: string;
   lastName: string;
   profileImageSrc: string;
-};
+}
 
-export type { User, CreateUserDAO };
+export { User, CreateUserDAO };

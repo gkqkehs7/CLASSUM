@@ -8,18 +8,11 @@ import {
   SpaceRoleType,
 } from '../../entities/spaceRole.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
-import {
-  CreateSpaceMemberDAO,
-  CreateSpaceReponse,
-  DeleteSpaceResponse,
-  EntranceSpaceResponse,
-  Space,
-} from '../../types/spaces.types';
+import { CreateSpaceMemberDAO, Space } from '../../types/spaces.types';
 import { UsersService } from '../users/users.service';
 import { SpaceRolesService } from '../spaceRole/spaceRoles.service';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
 import { UserEntity } from '../../entities/user.entity';
-import { ModelConverter } from '../../types/model.converter';
 import { SuccessResponse } from '../../types/common.types';
 
 @Injectable()
@@ -32,7 +25,7 @@ export class SpacesService {
     @InjectRepository(SpaceRoleEntity)
     private spaceRoleRepository: Repository<SpaceRoleEntity>,
     @InjectRepository(SpaceRoleEntity)
-    private spaceMemberEntityRepository: Repository<SpaceMemberEntity>,
+    private spaceMemberRepository: Repository<SpaceMemberEntity>,
     private usersService: UsersService,
     private spaceRolesService: SpaceRolesService,
     private readonly connection: Connection,
@@ -104,7 +97,7 @@ export class SpacesService {
 
     if (user.spaces.length === 0) return [];
 
-    return user.spaces.map((space) => ModelConverter.space(space));
+    return user.spaces;
   }
 
   /**
@@ -122,7 +115,7 @@ export class SpacesService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -154,7 +147,7 @@ export class SpacesService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 

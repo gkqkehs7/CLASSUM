@@ -12,6 +12,7 @@ import { SpacesModule } from './modules/spaces/spaces.module';
 import { SpaceRolesModule } from './modules/spaceRole/spaceRoles.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { ChatsModule } from './modules/chat/chats.module';
+import { ReplyChatsModule } from './modules/reply.chats/reply.chats.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ChatsModule } from './modules/chat/chats.module';
     SpaceRolesModule,
     PostsModule,
     ChatsModule,
+    ReplyChatsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

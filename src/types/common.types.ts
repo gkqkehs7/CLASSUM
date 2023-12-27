@@ -1,5 +1,5 @@
-type SuccessResponse = {
+interface SuccessResponse {
   success: true;
-};
+}
 
-export type { SuccessResponse };
+export { SuccessResponse };

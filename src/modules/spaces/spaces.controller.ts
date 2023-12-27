@@ -23,8 +23,10 @@ import { CreatePostRequestDto } from './request.dto/create.post.request.dto';
 import { PostType } from '../../entities/post.entity';
 import { PostsService } from '../posts/posts.service';
 import { SuccessResponseDto } from '../dto/success.response.dto';
-import { CreateChatRequestDto } from '../chat/dto/create.chat.request.dto';
 import { ChatsService } from '../chat/chats.service';
+import { ReplyChatsService } from '../reply.chats/reply.chats.service';
+import { CreateChatRequestDto } from './request.dto/create.chat.request.dto';
+import { CreateReplyChatRequestDto } from './request.dto/create.reply.chat.request.dto';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -34,6 +36,7 @@ export class SpacesController {
     private spaceRolesService: SpaceRolesService,
     private postsService: PostsService,
     private chatsService: ChatsService,
+    private replyChatsService: ReplyChatsService,
   ) {}
 
   @ApiOperation({
@@ -125,7 +128,7 @@ export class SpacesController {
     summary: '유저의 space role 변경',
   })
   @UseGuards(AccessTokenGuard)
-  @Patch('/:spaceId/user/:userId/roles')
+  @Patch('/:spaceId/users/:userId/roles')
   async updateUserSpaceRole(
     @Req() request,
     @Param('userId') userId: string,
@@ -147,7 +150,7 @@ export class SpacesController {
     summary: 'post 생성',
   })
   @UseGuards(AccessTokenGuard)
-  @Post('/space/:spaceId/post')
+  @Post('/:spaceId/post')
   async createPost(
     @Req() request,
     @Param('spaceId') spaceId: string,
@@ -155,7 +158,7 @@ export class SpacesController {
     @Body() createPostRequestDto: CreatePostRequestDto,
   ): Promise<SuccessResponseDto> {
     if (
-      query.postType !== PostType.NOTIFICATION ||
+      query.postType !== PostType.NOTIFICATION &&
       query.postType !== PostType.QUESTION
     ) {
       throw new Error('잘못된 쿼리 형식입니다.');
@@ -163,7 +166,7 @@ export class SpacesController {
 
     const response = await this.postsService.createPost(
       parseInt(request.userId),
-      parseInt(request.spaceId),
+      parseInt(spaceId),
       query.postType,
       createPostRequestDto,
     );
@@ -171,12 +174,30 @@ export class SpacesController {
     return new SuccessResponseDto(response);
   }
 
-  // posts
+  @ApiOperation({
+    summary: 'post 가져오기',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Get('/:spaceId/posts/:postId')
+  async getPost(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+  ) {
+    const response = await this.postsService.getPost(
+      parseInt(request.userId),
+      parseInt(spaceId),
+      parseInt(postId),
+    );
+
+    return response;
+  }
+
   @ApiOperation({
     summary: 'post 삭제',
   })
   @UseGuards(AccessTokenGuard)
-  @Post('/space/:spaceId/post/:postId')
+  @Post('/:spaceId/posts/:postId')
   async deletePost(
     @Req() request,
     @Param('spaceId') spaceId: string,
@@ -184,8 +205,8 @@ export class SpacesController {
   ): Promise<SuccessResponseDto> {
     const response = await this.postsService.deletePost(
       parseInt(request.userId),
-      parseInt(request.spaceId),
-      parseInt(request.postId),
+      parseInt(spaceId),
+      parseInt(postId),
     );
 
     return new SuccessResponseDto(response);
@@ -196,7 +217,7 @@ export class SpacesController {
     summary: 'chat 생성',
   })
   @UseGuards(AccessTokenGuard)
-  @Post('/space/:spaceId/post/:postId/chat')
+  @Post('/:spaceId/posts/:postId/chats')
   async createChat(
     @Req() request,
     @Param('spaceId') spaceId: string,
@@ -205,9 +226,77 @@ export class SpacesController {
   ): Promise<SuccessResponseDto> {
     const response = await this.chatsService.createChat(
       parseInt(request.userId),
-      parseInt(request.spaceId),
-      parseInt(request.postId),
+      parseInt(spaceId),
+      parseInt(postId),
       createChatRequestDto,
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: 'chat 삭제',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Delete('/:spaceId/posts/:postId/chats/:chatId')
+  async deleteChat(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+    @Param('chatId') chatId: string,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.chatsService.deleteChat(
+      parseInt(request.userId),
+      parseInt(spaceId),
+      parseInt(postId),
+      parseInt(chatId),
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
+  // replyChats
+  @ApiOperation({
+    summary: 'replyChat 생성',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Post('/:spaceId/posts/:postId/chats/:chatId/replyChats')
+  async createReplyChat(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+    @Param('chatId') chatId: string,
+    @Body() createReplyChatRequestDto: CreateReplyChatRequestDto,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.replyChatsService.createReplyChat(
+      parseInt(request.userId),
+      parseInt(spaceId),
+      parseInt(postId),
+      parseInt(chatId),
+      createReplyChatRequestDto,
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: 'replyChat 삭제',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Delete('/:spaceId/posts/:postId/chats/:chatId/replyChats/:replyChatId')
+  async deleteReplyChat(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+    @Param('chatId') chatId: string,
+    @Param('replyChatId') replyChatId: string,
+  ): Promise<SuccessResponseDto> {
+    const response = await this.replyChatsService.deleteReplyChat(
+      parseInt(request.userId),
+      parseInt(spaceId),
+      parseInt(postId),
+      parseInt(chatId),
+      parseInt(replyChatId),
     );
 
     return new SuccessResponseDto(response);

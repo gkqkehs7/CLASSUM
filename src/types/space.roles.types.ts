@@ -1,17 +1,17 @@
-type CreateSpaceRoleDAO = {
+interface CreateSpaceRoleDAO {
   spaceId: number;
   roleName: string;
-};
+}
 
-type DeleteSpaceRoleResponse = {
+interface DeleteSpaceRoleResponse {
   success: true;
-};
+}
 
-type UpdateUserSpaceRoleResponse = {
+interface UpdateUserSpaceRoleResponse {
   success: true;
-};
+}
 
-export type {
+export {
   CreateSpaceRoleDAO,
   DeleteSpaceRoleResponse,
   UpdateUserSpaceRoleResponse,

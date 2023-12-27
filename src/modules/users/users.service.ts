@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../../entities/user.entity';
-import { ModelConverter } from '../../types/model.converter';
 import { CreateUserDAO, User } from '../../types/users.types';
 
 @Injectable()
@@ -36,7 +35,7 @@ export class UsersService {
       throw new Error('존재하지 않는 이메일입니다.');
     }
 
-    return ModelConverter.user(user);
+    return user;
   }
 
   /**
@@ -56,6 +55,6 @@ export class UsersService {
 
     await this.userRepository.save(user);
 
-    return ModelConverter.user(user);
+    return user;
   }
 }

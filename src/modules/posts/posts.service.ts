@@ -10,6 +10,7 @@ import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity, PostType } from '../../entities/post.entity';
 import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
 import { SuccessResponse } from '../../types/common.types';
+import { PostWithChats } from '../../types/posts.types';
 
 @Injectable()
 export class PostsService {
@@ -18,10 +19,10 @@ export class PostsService {
     private spaceRepository: Repository<SpaceEntity>,
     @InjectRepository(SpaceRoleEntity)
     private spaceRoleRepository: Repository<SpaceRoleEntity>,
-    @InjectRepository(SpaceRoleEntity)
-    private spaceMemberEntityRepository: Repository<SpaceMemberEntity>,
+    @InjectRepository(SpaceMemberEntity)
+    private spaceMemberRepository: Repository<SpaceMemberEntity>,
     @InjectRepository(PostEntity)
-    private postEntityRepository: Repository<PostEntity>,
+    private postRepository: Repository<PostEntity>,
   ) {}
 
   async createPost(
@@ -38,7 +39,7 @@ export class PostsService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -53,7 +54,7 @@ export class PostsService {
       throw new Error('관리자만 공지글을 작성할 수 있습니다.');
     }
 
-    if (anonymous && role === SpaceRoleType.PARTICIPANT) {
+    if (anonymous && role === SpaceRoleType.ADMIN) {
       throw new Error('참여자만 게시글을 익명으로 작성할 수 있습니다.');
     }
 
@@ -65,9 +66,79 @@ export class PostsService {
     post.userId = userId;
     post.spaceId = spaceId;
 
-    await this.postEntityRepository.save(post);
+    await this.postRepository.save(post);
 
     return { success: true };
+  }
+
+  async getPost(
+    userId: number,
+    spaceId: number,
+    postId: number,
+  ): Promise<PostWithChats> {
+    const space = await this.spaceRepository.findOne({
+      where: { id: spaceId },
+    });
+
+    if (!space) {
+      throw new Error('존재하지 않는 space 입니다.');
+    }
+
+    const post = await this.postRepository.findOne({
+      where: { id: postId },
+      relations: [
+        'user',
+        'chats',
+        'chats.replyChats',
+        'chats.user',
+        'chats.replyChats.user',
+      ],
+    });
+
+    if (!post) {
+      throw new Error('존재하지 않는 post 입니다.');
+    }
+
+    const spaceMember = await this.spaceMemberRepository.findOne({
+      where: { userId: userId, spaceId: spaceId },
+    });
+
+    if (!spaceMember) {
+      throw new Error('space 멤버만 댓글을 작성할 수 있습니다.');
+    }
+
+    const role = spaceMember.roleType;
+
+    if (post.anonymous) {
+      post.user =
+        role === SpaceRoleType.ADMIN || post.userId === userId
+          ? post.user
+          : null;
+    }
+
+    post.chats = post.chats.map((chat) => {
+      chat.replyChats = chat.replyChats.map((replyChat) => {
+        if (replyChat.anonymous) {
+          replyChat.user =
+            role === SpaceRoleType.ADMIN && replyChat.userId === userId
+              ? replyChat.user
+              : null;
+        }
+
+        return replyChat;
+      });
+
+      if (chat.anonymous) {
+        chat.user =
+          role === SpaceRoleType.ADMIN && chat.userId === userId
+            ? chat.user
+            : null;
+      }
+
+      return chat;
+    });
+
+    return post;
   }
 
   async deletePost(
@@ -83,7 +154,7 @@ export class PostsService {
       throw new Error('존재하지 않는 space 입니다.');
     }
 
-    const spaceMember = await this.spaceMemberEntityRepository.findOne({
+    const spaceMember = await this.spaceMemberRepository.findOne({
       where: { userId: userId, spaceId: spaceId },
     });
 
@@ -93,16 +164,16 @@ export class PostsService {
       throw new Error('관리자만 공지글을 삭제할 수 있습니다.');
     }
 
-    const post = await this.postEntityRepository.findOne({
+    const post = await this.postRepository.findOne({
       where: { id: postId },
-      relations: ['chats', 'images'],
+      relations: ['chats', 'chat.replyChats', 'images'],
     });
 
     if (!post) {
       throw new Error('존재하지 않는 post 입니다.');
     }
 
-    await this.postEntityRepository.softRemove(post);
+    await this.postRepository.softRemove(post);
 
     return { success: true };
   }
