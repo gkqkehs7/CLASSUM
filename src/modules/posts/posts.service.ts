@@ -1,9 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SpaceEntity } from '../../entities/space.entity';
 import { QueryRunner, Repository } from 'typeorm';
-import { SpaceRoleEntity } from '../../entities/spaceRole.entity';
-import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity, PostType } from '../../entities/post.entity';
 import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
 import { SuccessResponse } from '../../types/common.types';
@@ -14,12 +11,6 @@ import { SpaceMembersService } from '../space.member/space.members.service';
 @Injectable()
 export class PostsService {
   constructor(
-    @InjectRepository(SpaceEntity)
-    private spaceRepository: Repository<SpaceEntity>,
-    @InjectRepository(SpaceRoleEntity)
-    private spaceRoleRepository: Repository<SpaceRoleEntity>,
-    @InjectRepository(SpaceMemberEntity)
-    private spaceMemberRepository: Repository<SpaceMemberEntity>,
     @InjectRepository(PostEntity)
     private postRepository: Repository<PostEntity>,
     @Inject(forwardRef(() => SpacesService))

@@ -1,26 +1,86 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SpaceEntity } from '../../entities/space.entity';
-import { Repository } from 'typeorm';
-import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
-import { PostEntity } from '../../entities/post.entity';
+import { QueryRunner, Repository } from 'typeorm';
 import { ChatEntity } from '../../entities/chat.entity';
 import { SuccessResponse } from '../../types/common.types';
 import { CreateChatRequestDto } from '../spaces/request.dto/create.chat.request.dto';
-import { SpaceRoleType } from '../../entities/spaceRole.entity';
+import { CreateChatDAO } from '../../types/chats.types';
+import { SpacesService } from '../spaces/spaces.service';
+import { SpaceMembersService } from '../space.member/space.members.service';
+import { PostsService } from '../posts/posts.service';
 
 @Injectable()
 export class ChatsService {
   constructor(
-    @InjectRepository(SpaceEntity)
-    private spaceRepository: Repository<SpaceEntity>,
-    @InjectRepository(SpaceMemberEntity)
-    private spaceMemberRepository: Repository<SpaceMemberEntity>,
-    @InjectRepository(PostEntity)
-    private postRepository: Repository<PostEntity>,
     @InjectRepository(ChatEntity)
     private chatRepository: Repository<ChatEntity>,
+    private readonly postsService: PostsService,
+    private readonly spacesService: SpacesService,
+    private readonly spaceMembersService: SpaceMembersService,
   ) {}
+
+  /**
+   * chatEntity 생성
+   * @param createChatDAO
+   * @param queryRunner
+   */
+  async createChatEntity(
+    createChatDAO: CreateChatDAO,
+    queryRunner: QueryRunner,
+  ): Promise<ChatEntity> {
+    const { content, anonymous, userId, postId } = createChatDAO;
+
+    const chat = new ChatEntity();
+    chat.content = content;
+    chat.anonymous = anonymous;
+    chat.userId = userId;
+    chat.postId = postId;
+
+    if (queryRunner) {
+      await queryRunner.manager.getRepository(ChatEntity).save(chat);
+    } else {
+      await this.chatRepository.save(chat);
+    }
+
+    return chat;
+  }
+
+  /**
+   * chatEntity 가져오기
+   * @param where
+   * @param relations
+   */
+  async getChatEntity(
+    where: { [key: string]: any },
+    relations: string[] | null,
+  ): Promise<ChatEntity> {
+    const chat = await this.chatRepository.findOne({
+      where: where,
+      relations: relations,
+    });
+
+    if (!chat) {
+      throw new Error('존재하지 않는 chat 입니다.');
+    }
+
+    return chat;
+  }
+
+  /**
+   * chatEntity 삭제
+   * @param chat
+   * @param queryRunner
+   */
+  async deleteChatEntity(
+    chat: ChatEntity,
+    queryRunner: QueryRunner,
+  ): Promise<void> {
+    if (queryRunner) {
+      await queryRunner.manager.getRepository(ChatEntity).softRemove(chat);
+    } else {
+      await this.chatRepository.softRemove(chat);
+    }
+  }
 
   /**
    * 채팅 생성
@@ -37,43 +97,41 @@ export class ChatsService {
   ): Promise<SuccessResponse> {
     const { content, anonymous } = createChatRequestDto;
 
-    const space = await this.spaceRepository.findOne({
-      where: { id: spaceId },
-    });
+    // 존재하는 space인지 확인
+    await this.spacesService.getSpaceEntity({ id: spaceId }, null);
 
-    if (!space) {
-      throw new Error('존재하지 않는 space 입니다.');
-    }
+    // 존재하는 post인지 확인
+    await this.postsService.getPostEntity({ id: postId }, null);
 
-    const spaceMember = await this.spaceMemberRepository.findOne({
-      where: { userId: userId, spaceId: spaceId },
-    });
+    // space member만 작성 가능
+    const isMember = await this.spaceMembersService.isMember(userId, spaceId);
 
-    if (!spaceMember) {
+    if (!isMember) {
       throw new Error('space 멤버만 댓글을 작성할 수 있습니다.');
     }
 
-    const role = spaceMember.roleType;
+    // 익명인 경우 참여자만 작성 가능
+    if (anonymous) {
+      const isParticipate = await this.spaceMembersService.isParticipate(
+        userId,
+        spaceId,
+      );
 
-    if (anonymous && role === SpaceRoleType.ADMIN) {
-      throw new Error('참여자만 댓글을 익명으로 작성할 수 있습니다.');
+      if (!isParticipate) {
+        throw new Error('참여자만 댓글을 익명으로 작성할 수 있습니다.');
+      }
     }
 
-    const post = await this.postRepository.findOne({
-      where: { id: postId },
-    });
-
-    if (!post) {
-      throw new Error('존재하지 않는 게시글입니다.');
-    }
-
-    const chat = new ChatEntity();
-    chat.content = content;
-    chat.anonymous = anonymous;
-    chat.userId = userId;
-    chat.postId = postId;
-
-    await this.chatRepository.save(chat);
+    // chatEntity 생성
+    await this.createChatEntity(
+      {
+        content: content,
+        anonymous: anonymous,
+        userId: userId,
+        postId: postId,
+      },
+      null,
+    );
 
     return { success: true };
   }
@@ -91,34 +149,22 @@ export class ChatsService {
     postId: number,
     chatId: number,
   ): Promise<SuccessResponse> {
-    const space = await this.spaceRepository.findOne({
-      where: { id: spaceId },
-    });
+    // 존재하는 space인지 확인
+    await this.spacesService.getSpaceEntity({ id: spaceId }, null);
 
-    if (!space) {
-      throw new Error('존재하지 않는 space 입니다.');
-    }
+    // 존재하는 chat인지 확인
+    const chat = await this.getChatEntity({ id: chatId }, ['replyChats']);
 
-    const chat = await this.chatRepository.findOne({
-      where: { id: chatId },
-      relations: ['replyChats'],
-    });
+    // 관리자인지 확인
+    const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
 
-    if (!chat) {
-      throw new Error('존재하지 않는 chat 입니다.');
-    }
-
-    const spaceMember = await this.spaceMemberRepository.findOne({
-      where: { userId: userId, spaceId: spaceId },
-    });
-
-    const role = spaceMember.roleType;
-
-    if (role !== SpaceRoleType.ADMIN && chat.userId !== userId) {
+    // 관리자나 작성자만 삭제 가능
+    if (!isAdmin && chat.userId === userId) {
       throw new Error('작성자나 관리자만 댓글을 삭제할 수 있습니다.');
     }
 
-    await this.chatRepository.softRemove(chat);
+    // chat 삭제
+    await this.deleteChatEntity(chat, null);
 
     return { success: true };
   }
