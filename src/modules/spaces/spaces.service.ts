@@ -13,7 +13,6 @@ import { UsersService } from '../users/users.service';
 import { SpaceRolesService } from '../spaceRole/spaceRoles.service';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
 import { UserEntity } from '../../entities/user.entity';
-import { ModelConverter } from '../../types/model.converter';
 import { SuccessResponse } from '../../types/common.types';
 
 @Injectable()
@@ -98,7 +97,7 @@ export class SpacesService {
 
     if (user.spaces.length === 0) return [];
 
-    return user.spaces.map((space) => ModelConverter.space(space));
+    return user.spaces;
   }
 
   /**

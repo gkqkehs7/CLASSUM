@@ -8,6 +8,7 @@ import { ChatEntity } from '../../entities/chat.entity';
 import { CreateReplyChatRequestDto } from '../spaces/request.dto/create.reply.chat.request.dto';
 import { ReplyChatEntity } from '../../entities/replyChat.entity';
 import { SuccessResponse } from '../../types/common.types';
+import { SpaceRoleType } from '../../entities/spaceRole.entity';
 
 @Injectable()
 export class ReplyChatsService {
@@ -31,6 +32,8 @@ export class ReplyChatsService {
     chatId: number,
     createReplyChatRequestDto: CreateReplyChatRequestDto,
   ): Promise<SuccessResponse> {
+    const { content, anonymous } = createReplyChatRequestDto;
+
     const space = await this.spaceRepository.findOne({
       where: { id: spaceId },
     });
@@ -47,6 +50,12 @@ export class ReplyChatsService {
       throw new Error('space 멤버만 댓글을 작성할 수 있습니다.');
     }
 
+    const role = spaceMember.roleType;
+
+    if (anonymous && role === SpaceRoleType.ADMIN) {
+      throw new Error('참여자만 댓글을 익명으로 작성할 수 있습니다.');
+    }
+
     const post = await this.postRepository.findOne({
       where: { id: postId },
     });
@@ -54,8 +63,6 @@ export class ReplyChatsService {
     if (!post) {
       throw new Error('존재하지 않는 게시글입니다.');
     }
-
-    const { content, anonymous } = createReplyChatRequestDto;
 
     const replyChat = new ReplyChatEntity();
     replyChat.content = content;

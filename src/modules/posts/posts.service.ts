@@ -10,7 +10,6 @@ import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity, PostType } from '../../entities/post.entity';
 import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
 import { SuccessResponse } from '../../types/common.types';
-import { ModelConverter } from '../../types/model.converter';
 import { PostWithChats } from '../../types/posts.types';
 
 @Injectable()
@@ -55,7 +54,7 @@ export class PostsService {
       throw new Error('관리자만 공지글을 작성할 수 있습니다.');
     }
 
-    if (anonymous && role === SpaceRoleType.PARTICIPANT) {
+    if (anonymous && role === SpaceRoleType.ADMIN) {
       throw new Error('참여자만 게시글을 익명으로 작성할 수 있습니다.');
     }
 
@@ -99,6 +98,45 @@ export class PostsService {
     if (!post) {
       throw new Error('존재하지 않는 post 입니다.');
     }
+
+    const spaceMember = await this.spaceMemberRepository.findOne({
+      where: { userId: userId, spaceId: spaceId },
+    });
+
+    if (!spaceMember) {
+      throw new Error('space 멤버만 댓글을 작성할 수 있습니다.');
+    }
+
+    const role = spaceMember.roleType;
+
+    if (post.anonymous) {
+      post.user =
+        role === SpaceRoleType.ADMIN || post.userId === userId
+          ? post.user
+          : null;
+    }
+
+    post.chats = post.chats.map((chat) => {
+      chat.replyChats = chat.replyChats.map((replyChat) => {
+        if (replyChat.anonymous) {
+          replyChat.user =
+            role === SpaceRoleType.ADMIN && replyChat.userId === userId
+              ? replyChat.user
+              : null;
+        }
+
+        return replyChat;
+      });
+
+      if (chat.anonymous) {
+        chat.user =
+          role === SpaceRoleType.ADMIN && chat.userId === userId
+            ? chat.user
+            : null;
+      }
+
+      return chat;
+    });
 
     return post;
   }
