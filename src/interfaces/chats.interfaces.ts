@@ -1,4 +1,4 @@
-import { ReplyChats } from './reply.chats.types';
+import { ReplyChats } from './reply.chats.interfaces';
 import { ChatEntity } from '../entities/chat.entity';
 
 interface Chat extends ChatEntity {}

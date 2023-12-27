@@ -8,12 +8,12 @@ import {
   SpaceRoleType,
 } from '../../entities/spaceRole.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
-import { CreateSpaceDAO, Space } from '../../types/spaces.types';
+import { CreateSpaceDAO, Space } from '../../interfaces/spaces.interfaces';
 import { UsersService } from '../users/users.service';
 import { SpaceRolesService } from '../space.roles/space.roles.service';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
 import { UserEntity } from '../../entities/user.entity';
-import { SuccessResponse } from '../../types/common.types';
+import { SuccessResponse } from '../../interfaces/common.interfaces';
 import { SpaceMembersService } from '../space.member/space.members.service';
 
 @Injectable()

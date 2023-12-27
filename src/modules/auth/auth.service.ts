@@ -4,7 +4,10 @@ import bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { SignInRequestDto } from './request.dto/signIn.request.dto';
 import { SignUpRequestDto } from './request.dto/signUp.request.dto';
-import { SignInResponse, SignUpResponse } from '../../types/auth.types';
+import {
+  SignInResponse,
+  SignUpResponse,
+} from '../../interfaces/auth.interfaces';
 
 @Injectable()
 export class AuthService {

@@ -3,7 +3,7 @@ import {
   CreateSpaceRoleDAO,
   DeleteSpaceRoleResponse,
   UpdateUserSpaceRoleResponse,
-} from '../../types/space.roles.types';
+} from '../../interfaces/space.roles.interfaces';
 import { QueryRunner, Repository } from 'typeorm';
 import { SpaceRoleEntity } from '../../entities/spaceRole.entity';
 import { InjectRepository } from '@nestjs/typeorm';

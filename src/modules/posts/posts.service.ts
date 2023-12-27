@@ -3,8 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository } from 'typeorm';
 import { PostEntity, PostType } from '../../entities/post.entity';
 import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
-import { SuccessResponse } from '../../types/common.types';
-import { CreatePostDAO, PostWithChats } from '../../types/posts.types';
+import { SuccessResponse } from '../../interfaces/common.interfaces';
+import {
+  CreatePostDAO,
+  PostWithChats,
+} from '../../interfaces/posts.interfaces';
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
 

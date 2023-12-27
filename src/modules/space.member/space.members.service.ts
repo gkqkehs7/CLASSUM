@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { SpaceEntity } from '../../entities/space.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
-import { CreateSpaceMemberDAO } from '../../types/space.members.types';
+import { CreateSpaceMemberDAO } from '../../interfaces/space.members.interfaces';
 
 @Injectable()
 export class SpaceMembersService {

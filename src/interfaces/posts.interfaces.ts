@@ -1,6 +1,6 @@
 import { PostEntity, PostType } from '../entities/post.entity';
-import { ChatWithReplyChats } from './chats.types';
-import { User } from './users.types';
+import { ChatWithReplyChats } from './chats.interfaces';
+import { User } from './users.interfaces';
 
 interface Post extends PostEntity {}
 

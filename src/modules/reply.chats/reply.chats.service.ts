@@ -3,12 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository } from 'typeorm';
 import { CreateReplyChatRequestDto } from '../spaces/request.dto/create.reply.chat.request.dto';
 import { ReplyChatEntity } from '../../entities/replyChat.entity';
-import { SuccessResponse } from '../../types/common.types';
+import { SuccessResponse } from '../../interfaces/common.interfaces';
 import { PostsService } from '../posts/posts.service';
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
 import { ChatsService } from '../chat/chats.service';
-import { CreateReplyChatDAO } from '../../types/reply.chats.types';
+import { CreateReplyChatDAO } from '../../interfaces/reply.chats.interfaces';
 
 @Injectable()
 export class ReplyChatsService {
