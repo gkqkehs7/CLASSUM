@@ -3,12 +3,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository } from 'typeorm';
 import { UserEntity } from '../../entities/user.entity';
 import { CreateUserDAO, User } from '../../interfaces/users.interfaces';
+import { PostsService } from '../posts/posts.service';
+import { ChatsService } from '../chat/chats.service';
+import { SpacesService } from '../spaces/spaces.service';
+import { ReplyChatsService } from '../reply.chats/reply.chats.service';
+import { Space } from '../../interfaces/spaces.interfaces';
+import { Post } from '../../interfaces/posts.interfaces';
+import { Chat } from '../../interfaces/chats.interfaces';
+import { ReplyChat } from '../../interfaces/reply.chats.interfaces';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private readonly spacesService: SpacesService,
+    private readonly postsService: PostsService,
+    private readonly chatsService: ChatsService,
+    private readonly replyChatsService: ReplyChatsService,
   ) {}
 
   /**
@@ -70,5 +82,77 @@ export class UsersService {
 
     // boolean casting
     return !!isExist;
+  }
+
+  /**
+   * 다른 사람 프로필 가져오기
+   * @param userId
+   */
+  async getUserInfo(userId: number, otherId: number): Promise<User> {
+    return await this.getUserEntity({ id: otherId }, null);
+  }
+
+  /**
+   * 자신의 프로필 가져오기
+   * @param userId
+   */
+  async getMyInfo(userId: number): Promise<User> {
+    return await this.getUserEntity({ id: userId }, null);
+  }
+
+  /**
+   * 나의 공간들 가져오기
+   * @param userId
+   */
+  async getMySpaces(userId: number): Promise<Space[]> {
+    const user = await this.getUserEntity({ id: userId }, ['spaces']);
+
+    if (user.spaces.length === 0) {
+      return [];
+    }
+
+    return user.spaces;
+  }
+
+  /**
+   * 내가 작성한 게시글들 가져오기
+   * @param userId
+   */
+  async getMyPosts(userId: number): Promise<Post[]> {
+    const user = await this.getUserEntity({ id: userId }, ['posts']);
+
+    if (user.posts.length === 0) {
+      return [];
+    }
+
+    return user.posts;
+  }
+
+  /**
+   * 내가 작성한 댓글들 가져오기
+   * @param userId
+   */
+  async getMyChats(userId: number): Promise<Chat[]> {
+    const user = await this.getUserEntity({ id: userId }, ['chats']);
+
+    if (user.chats.length === 0) {
+      return [];
+    }
+
+    return user.chats;
+  }
+
+  /**
+   * 내가 작성한 답글들 가져오기
+   * @param userId
+   */
+  async getMyReplyChats(userId: number): Promise<ReplyChat[]> {
+    const user = await this.getUserEntity({ id: userId }, ['replyChats']);
+
+    if (user.replyChats.length === 0) {
+      return [];
+    }
+
+    return user.replyChats;
   }
 }
