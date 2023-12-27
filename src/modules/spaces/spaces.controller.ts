@@ -15,7 +15,7 @@ import { SpacesService } from './spaces.service';
 import { AccessTokenGuard } from '../../guards/access.token.guards';
 import { CreateSpaceRequestDto } from './request.dto/create.space.request.dto';
 import { UpdateUserSpaceRoleRequestDto } from './request.dto/update.user.space.role.request.dto';
-import { SpaceRolesService } from '../spaceRole/spaceRoles.service';
+import { SpaceRolesService } from '../space.roles/space.roles.service';
 import { DeleteSpaceRoleRequestDto } from './request.dto/delete.space.role.request.dto';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
 import { GetMySpacesResponseDto } from './response.dto/get.my.spaces.response.dto';

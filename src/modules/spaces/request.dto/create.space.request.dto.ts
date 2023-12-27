@@ -31,9 +31,22 @@ export class CreateSpaceRequestDto {
   readonly adminCode: string;
 
   @ApiProperty({
-    description: 'space 역할들',
+    description: '자신 역할 이름',
+  })
+  @IsString()
+  readonly roleName: string;
+
+  @ApiProperty({
+    description: '관리자 역할 이름들',
   })
   @IsArray()
   @IsString({ each: true })
-  readonly roleNames: string[];
+  readonly adminRoleNames: string[];
+
+  @ApiProperty({
+    description: '참여자 역할 이름들',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  readonly partRoleNames: string[];
 }

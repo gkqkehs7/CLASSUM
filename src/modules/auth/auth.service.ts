@@ -4,7 +4,10 @@ import bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { SignInRequestDto } from './request.dto/signIn.request.dto';
 import { SignUpRequestDto } from './request.dto/signUp.request.dto';
-import { SignInResponse, SignUpResponse } from '../../types/auth.types';
+import {
+  SignInResponse,
+  SignUpResponse,
+} from '../../interfaces/auth.interfaces';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +24,7 @@ export class AuthService {
     const { email, password } = signInRequestDto;
 
     // 이메일로 유저 검색
-    const user = await this.usersService.findUserByEmail(email);
+    const user = await this.usersService.getUserEntity({ email: email }, null);
 
     // 유저 비밀번호 확인
     const passwordMatch = await this.checkPassword(password, user.password);
@@ -56,13 +59,16 @@ export class AuthService {
     const hashedPassword = await this.hashPassword(password);
 
     // 유저 생성
-    const user = await this.usersService.createUser({
-      email: email,
-      hashedPassword: hashedPassword,
-      firstName: firstName,
-      lastName: lastName,
-      profileImageSrc: profileImageSrc,
-    });
+    const user = await this.usersService.createUserEntity(
+      {
+        email: email,
+        hashedPassword: hashedPassword,
+        firstName: firstName,
+        lastName: lastName,
+        profileImageSrc: profileImageSrc,
+      },
+      null,
+    );
 
     // 유저 id로 토큰들 생성
     const accessToken = this.createAccessToken(user.id);
@@ -110,13 +116,5 @@ export class AuthService {
    */
   createRefreshToken(userId: number): string {
     return this.jwtService.sign({ userId: `${userId}` }, { expiresIn: `30d` });
-  }
-
-  /**
-   * accessToken 재생성
-   * @param userId
-   */
-  refresh(userId: number): string {
-    return this.createRefreshToken(userId);
   }
 }

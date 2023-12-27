@@ -9,10 +9,11 @@ import { GlobalJwtModule } from './modules/jwt/jwt.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { SpacesModule } from './modules/spaces/spaces.module';
-import { SpaceRolesModule } from './modules/spaceRole/spaceRoles.module';
+import { SpaceRolesModule } from './modules/space.roles/space.roles.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { ChatsModule } from './modules/chat/chats.module';
 import { ReplyChatsModule } from './modules/reply.chats/reply.chats.module';
+import { SpaceMembersModule } from './modules/space.member/space.members.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ReplyChatsModule } from './modules/reply.chats/reply.chats.module';
     UsersModule,
     SpacesModule,
     SpaceRolesModule,
+    SpaceMembersModule,
     PostsModule,
     ChatsModule,
     ReplyChatsModule,

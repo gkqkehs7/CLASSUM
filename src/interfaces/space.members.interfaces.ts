@@ -1,7 +1,7 @@
 import { SpaceRoleType } from '../entities/spaceRole.entity';
-import { SpaceEntity } from '../entities/space.entity';
+import { SpaceMemberEntity } from '../entities/spaceMember.entity';
 
-interface Space extends SpaceEntity {}
+interface SpaceMember extends SpaceMemberEntity {}
 
 interface CreateSpaceMemberDAO {
   userId: number;
@@ -10,4 +10,4 @@ interface CreateSpaceMemberDAO {
   roleType: SpaceRoleType;
 }
 
-export { Space, CreateSpaceMemberDAO };
+export { SpaceMember, CreateSpaceMemberDAO };

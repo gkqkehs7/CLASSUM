@@ -6,6 +6,9 @@ import { SpaceEntity } from '../../entities/space.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity } from '../../entities/post.entity';
 import { ChatEntity } from '../../entities/chat.entity';
+import { SpacesModule } from '../spaces/spaces.module';
+import { SpaceMembersModule } from '../space.member/space.members.module';
+import { PostsModule } from '../posts/posts.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { ChatEntity } from '../../entities/chat.entity';
       PostEntity,
       ChatEntity,
     ]),
+    PostsModule,
+    SpacesModule,
+    SpaceMembersModule,
   ],
   exports: [ChatsService],
   providers: [ChatsService],
