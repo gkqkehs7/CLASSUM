@@ -8,6 +8,9 @@ import { ChatsService } from '../chat/chats.service';
 import { SpacesService } from '../spaces/spaces.service';
 import { ReplyChatsService } from '../reply.chats/reply.chats.service';
 import { Space } from '../../interfaces/spaces.interfaces';
+import { Post } from '../../interfaces/posts.interfaces';
+import { Chat } from '../../interfaces/chats.interfaces';
+import { ReplyChat } from '../../interfaces/reply.chats.interfaces';
 
 @Injectable()
 export class UsersService {
@@ -115,15 +118,41 @@ export class UsersService {
    * 내가 작성한 게시글들 가져오기
    * @param userId
    */
-  async getMyPosts(userId: number) {
-    console.log('hi');
+  async getMyPosts(userId: number): Promise<Post[]> {
+    const user = await this.getUserEntity({ id: userId }, ['posts']);
+
+    if (user.posts.length === 0) {
+      return [];
+    }
+
+    return user.posts;
   }
 
   /**
    * 내가 작성한 댓글들 가져오기
    * @param userId
    */
-  async getMyChats(userId: number) {
-    console.log('hi');
+  async getMyChats(userId: number): Promise<Chat[]> {
+    const user = await this.getUserEntity({ id: userId }, ['chats']);
+
+    if (user.chats.length === 0) {
+      return [];
+    }
+
+    return user.chats;
+  }
+
+  /**
+   * 내가 작성한 답글들 가져오기
+   * @param userId
+   */
+  async getMyReplyChats(userId: number): Promise<ReplyChat[]> {
+    const user = await this.getUserEntity({ id: userId }, ['replyChats']);
+
+    if (user.replyChats.length === 0) {
+      return [];
+    }
+
+    return user.replyChats;
   }
 }

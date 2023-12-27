@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetMySpaceResponseDto {
+class GetMySpaceResponseDto {
   @ApiProperty({
     description: 'space id',
   })

@@ -5,6 +5,9 @@ import { UsersService } from './users.service';
 import { GetMyInfoResponseDto } from './dto/get.my.info.response.dto';
 import { GetUserInfoResponseDto } from './dto/get.user.info.response.dto';
 import { GetMySpacesResponseDto } from './dto/get.my.spaces.response.dto';
+import { GetMyPostsResponseDto } from './dto/get.my.posts.response.dto';
+import { GetMyChatsResponseDto } from './dto/get.my.chats.response.dto';
+import { GetMyReplyChatsResponseDto } from './dto/get.my.reply.chats.response.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -55,8 +58,10 @@ export class UsersController {
   })
   @UseGuards(AccessTokenGuard)
   @Get('/me/posts')
-  async getMyPosts(@Req() request) {
+  async getMyPosts(@Req() request): Promise<GetMyPostsResponseDto> {
     const response = await this.usersService.getMyPosts(request.userId);
+
+    return new GetMyPostsResponseDto(response);
   }
 
   @ApiOperation({
@@ -64,7 +69,20 @@ export class UsersController {
   })
   @UseGuards(AccessTokenGuard)
   @Get('/me/chats')
-  async getMyChats(@Req() request) {
+  async getMyChats(@Req() request): Promise<GetMyChatsResponseDto> {
     const response = await this.usersService.getMyChats(request.userId);
+
+    return new GetMyChatsResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: '내가 작성한 답글들 가져오기',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Get('/me/replyChats')
+  async getMyReplyChats(@Req() request): Promise<GetMyReplyChatsResponseDto> {
+    const response = await this.usersService.getMyReplyChats(request.userId);
+
+    return new GetMyReplyChatsResponseDto(response);
   }
 }
