@@ -1,11 +1,11 @@
-type SignInResponse = {
+interface SignInResponse {
   accessToken: string;
   refreshToken: string;
-};
+}
 
-type SignUpResponse = {
+interface SignUpResponse {
   accessToken: string;
   refreshToken: string;
-};
+}
 
-export type { SignUpResponse, SignInResponse };
+export { SignUpResponse, SignInResponse };

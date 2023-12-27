@@ -1,4 +1,4 @@
-import { IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PostType } from '../../../entities/post.entity';
 
@@ -18,6 +18,6 @@ export class CreatePostRequestDto {
   @ApiProperty({
     description: '익명성 여부',
   })
-  @IsString()
+  @IsBoolean()
   readonly anonymous: boolean;
 }

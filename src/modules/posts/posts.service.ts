@@ -10,6 +10,8 @@ import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity, PostType } from '../../entities/post.entity';
 import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
 import { SuccessResponse } from '../../types/common.types';
+import { ModelConverter } from '../../types/model.converter';
+import { PostWithChats } from '../../types/posts.types';
 
 @Injectable()
 export class PostsService {
@@ -18,7 +20,7 @@ export class PostsService {
     private spaceRepository: Repository<SpaceEntity>,
     @InjectRepository(SpaceRoleEntity)
     private spaceRoleRepository: Repository<SpaceRoleEntity>,
-    @InjectRepository(SpaceRoleEntity)
+    @InjectRepository(SpaceMemberEntity)
     private spaceMemberRepository: Repository<SpaceMemberEntity>,
     @InjectRepository(PostEntity)
     private postRepository: Repository<PostEntity>,
@@ -70,7 +72,11 @@ export class PostsService {
     return { success: true };
   }
 
-  async getPost(userId: number, spaceId: number, postId: number) {
+  async getPost(
+    userId: number,
+    spaceId: number,
+    postId: number,
+  ): Promise<PostWithChats> {
     const space = await this.spaceRepository.findOne({
       where: { id: spaceId },
     });
@@ -81,8 +87,20 @@ export class PostsService {
 
     const post = await this.postRepository.findOne({
       where: { id: postId },
-      relations: ['chats'],
+      relations: [
+        'user',
+        'chats',
+        'chats.replyChats',
+        'chats.user',
+        'chats.replyChats.user',
+      ],
     });
+
+    if (!post) {
+      throw new Error('존재하지 않는 post 입니다.');
+    }
+
+    return post;
   }
 
   async deletePost(
@@ -110,7 +128,7 @@ export class PostsService {
 
     const post = await this.postRepository.findOne({
       where: { id: postId },
-      relations: ['chats', 'images'],
+      relations: ['chats', 'chat.replyChats', 'images'],
     });
 
     if (!post) {

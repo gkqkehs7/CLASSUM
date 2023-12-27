@@ -6,6 +6,7 @@ import { SpaceEntity } from '../../entities/space.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { PostEntity } from '../../entities/post.entity';
 import { ChatEntity } from '../../entities/chat.entity';
+import { ReplyChatEntity } from '../../entities/replyChat.entity';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ChatEntity } from '../../entities/chat.entity';
       SpaceMemberEntity,
       PostEntity,
       ChatEntity,
+      ReplyChatEntity,
     ]),
   ],
   exports: [ReplyChatsService],

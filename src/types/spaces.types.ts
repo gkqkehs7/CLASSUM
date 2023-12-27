@@ -1,36 +1,13 @@
 import { SpaceRoleType } from '../entities/spaceRole.entity';
+import { SpaceEntity } from '../entities/space.entity';
 
-type Space = {
-  id: number;
-  name: string;
-  logo: string;
-  code: string;
-  adminCode: string;
-};
+interface Space extends SpaceEntity {}
 
-type CreateSpaceReponse = {
-  success: boolean;
-};
-
-type DeleteSpaceResponse = {
-  success: boolean;
-};
-
-type CreateSpaceMemberDAO = {
+interface CreateSpaceMemberDAO {
   userId: number;
   spaceId: number;
   roleName: string;
   roleType: SpaceRoleType;
-};
+}
 
-type EntranceSpaceResponse = {
-  success: boolean;
-};
-
-export type {
-  Space,
-  CreateSpaceReponse,
-  DeleteSpaceResponse,
-  CreateSpaceMemberDAO,
-  EntranceSpaceResponse,
-};
+export { Space, CreateSpaceMemberDAO };
