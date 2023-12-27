@@ -1,8 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
   CreateSpaceRoleDAO,
-  DeleteSpaceRoleResponse,
-  UpdateUserSpaceRoleResponse,
+  SpaceRole,
 } from '../../interfaces/space.roles.interfaces';
 import { QueryRunner, Repository } from 'typeorm';
 import { SpaceRoleEntity } from '../../entities/spaceRole.entity';
@@ -13,6 +12,7 @@ import { DeleteSpaceRoleRequestDto } from '../spaces/request.dto/delete.space.ro
 import { UpdateUserSpaceRoleRequestDto } from '../spaces/request.dto/update.user.space.role.request.dto';
 import { SpaceMembersService } from '../space.member/space.members.service';
 import { SpacesService } from '../spaces/spaces.service';
+import { SuccessResponse } from '../../interfaces/common.interfaces';
 
 @Injectable()
 export class SpaceRolesService {
@@ -36,7 +36,7 @@ export class SpaceRolesService {
   async createSpaceRoleEntity(
     createSpaceRoleDAO: CreateSpaceRoleDAO,
     queryRunner: QueryRunner,
-  ): Promise<SpaceRoleEntity> {
+  ): Promise<SpaceRole> {
     const { spaceId, roleName, roleType } = createSpaceRoleDAO;
 
     const spaceRole = new SpaceRoleEntity();
@@ -61,7 +61,7 @@ export class SpaceRolesService {
   async getSpaceRoleEntity(
     where: { [key: string]: any },
     relations: string[] | null,
-  ): Promise<SpaceRoleEntity> {
+  ): Promise<SpaceRole> {
     const spaceRole = await this.spaceRoleRepository.findOne({
       where: where,
       relations: relations,
@@ -102,7 +102,7 @@ export class SpaceRolesService {
     userId: number,
     spaceId: number,
     deleteSpaceRoleRequestDto: DeleteSpaceRoleRequestDto,
-  ): Promise<DeleteSpaceRoleResponse> {
+  ): Promise<SuccessResponse> {
     const { roleName } = deleteSpaceRoleRequestDto;
 
     await this.spacesService.getSpaceEntity({ id: spaceId }, ['spaceRoles']);
@@ -146,7 +146,7 @@ export class SpaceRolesService {
     chageUserId: number,
     spaceId: number,
     updateUserSpaceRoleRequestDto: UpdateUserSpaceRoleRequestDto,
-  ): Promise<UpdateUserSpaceRoleResponse> {
+  ): Promise<SuccessResponse> {
     const { roleName, roleType } = updateUserSpaceRoleRequestDto;
 
     await this.spacesService.getSpaceEntity({ id: spaceId }, null);

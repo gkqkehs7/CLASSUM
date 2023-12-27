@@ -1,4 +1,4 @@
-import { ReplyChats } from './reply.chats.interfaces';
+import { ReplyChat } from './reply.chats.interfaces';
 import { ChatEntity } from '../entities/chat.entity';
 
 interface Chat extends ChatEntity {}
@@ -11,7 +11,7 @@ interface CreateChatDAO {
 }
 
 interface ChatWithReplyChats extends Chat {
-  replyChats: ReplyChats[];
+  replyChats: ReplyChat[];
 }
 
 export { Chat, CreateChatDAO, ChatWithReplyChats };

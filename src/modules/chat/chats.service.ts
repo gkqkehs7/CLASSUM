@@ -4,7 +4,7 @@ import { QueryRunner, Repository } from 'typeorm';
 import { ChatEntity } from '../../entities/chat.entity';
 import { SuccessResponse } from '../../interfaces/common.interfaces';
 import { CreateChatRequestDto } from '../spaces/request.dto/create.chat.request.dto';
-import { CreateChatDAO } from '../../interfaces/chats.interfaces';
+import { Chat, CreateChatDAO } from '../../interfaces/chats.interfaces';
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
 import { PostsService } from '../posts/posts.service';
@@ -27,7 +27,7 @@ export class ChatsService {
   async createChatEntity(
     createChatDAO: CreateChatDAO,
     queryRunner: QueryRunner,
-  ): Promise<ChatEntity> {
+  ): Promise<Chat> {
     const { content, anonymous, userId, postId } = createChatDAO;
 
     const chat = new ChatEntity();
@@ -53,7 +53,7 @@ export class ChatsService {
   async getChatEntity(
     where: { [key: string]: any },
     relations: string[] | null,
-  ): Promise<ChatEntity> {
+  ): Promise<Chat> {
     const chat = await this.chatRepository.findOne({
       where: where,
       relations: relations,

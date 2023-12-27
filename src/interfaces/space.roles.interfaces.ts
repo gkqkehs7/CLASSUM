@@ -1,4 +1,6 @@
-import { SpaceRoleType } from '../entities/spaceRole.entity';
+import { SpaceRoleEntity, SpaceRoleType } from '../entities/spaceRole.entity';
+
+interface SpaceRole extends SpaceRoleEntity {}
 
 interface CreateSpaceRoleDAO {
   spaceId: number;
@@ -6,16 +8,4 @@ interface CreateSpaceRoleDAO {
   roleType: SpaceRoleType;
 }
 
-interface DeleteSpaceRoleResponse {
-  success: true;
-}
-
-interface UpdateUserSpaceRoleResponse {
-  success: true;
-}
-
-export {
-  CreateSpaceRoleDAO,
-  DeleteSpaceRoleResponse,
-  UpdateUserSpaceRoleResponse,
-};
+export { SpaceRole, CreateSpaceRoleDAO };

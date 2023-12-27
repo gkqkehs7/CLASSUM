@@ -7,7 +7,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { SpaceEntity } from '../../entities/space.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
-import { CreateSpaceMemberDAO } from '../../interfaces/space.members.interfaces';
+import {
+  CreateSpaceMemberDAO,
+  SpaceMember,
+} from '../../interfaces/space.members.interfaces';
 
 @Injectable()
 export class SpaceMembersService {
@@ -28,7 +31,7 @@ export class SpaceMembersService {
   async createSpaceMemberEntity(
     createSpaceMemberDAO: CreateSpaceMemberDAO,
     queryRunner: QueryRunner,
-  ): Promise<SpaceMemberEntity> {
+  ): Promise<SpaceMember> {
     const { userId, spaceId, roleName, roleType } = createSpaceMemberDAO;
 
     const spaceMember = new SpaceMemberEntity();

@@ -8,7 +8,10 @@ import { PostsService } from '../posts/posts.service';
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
 import { ChatsService } from '../chat/chats.service';
-import { CreateReplyChatDAO } from '../../interfaces/reply.chats.interfaces';
+import {
+  CreateReplyChatDAO,
+  ReplyChat,
+} from '../../interfaces/reply.chats.interfaces';
 
 @Injectable()
 export class ReplyChatsService {
@@ -29,7 +32,7 @@ export class ReplyChatsService {
   async createReplyChatEntity(
     createReplyChatDAO: CreateReplyChatDAO,
     queryRunner: QueryRunner,
-  ): Promise<ReplyChatEntity> {
+  ): Promise<ReplyChat> {
     const { content, anonymous, userId, chatId } = createReplyChatDAO;
 
     const replyChat = new ReplyChatEntity();
@@ -55,7 +58,7 @@ export class ReplyChatsService {
   async getReplyChatEntity(
     where: { [key: string]: any },
     relations: string[] | null,
-  ): Promise<ReplyChatEntity> {
+  ): Promise<ReplyChat> {
     const replyChat = await this.replyChatRepository.findOne({
       where: where,
       relations: relations,
@@ -76,7 +79,7 @@ export class ReplyChatsService {
   async deleteReplyChatEntity(
     replyChat: ReplyChatEntity,
     queryRunner: QueryRunner,
-  ) {
+  ): Promise<void> {
     if (queryRunner) {
       await queryRunner.manager
         .getRepository(ReplyChatEntity)

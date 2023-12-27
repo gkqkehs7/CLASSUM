@@ -42,7 +42,7 @@ export class SpacesService {
   async createSpaceEntity(
     createSpaceDAO: CreateSpaceDAO,
     queryRunner: QueryRunner,
-  ): Promise<SpaceEntity> {
+  ): Promise<Space> {
     const { name, logo, code, adminCode } = createSpaceDAO;
 
     const space = new SpaceEntity();
@@ -68,7 +68,7 @@ export class SpacesService {
   async getSpaceEntity(
     where: { [key: string]: any },
     relations: string[] | null,
-  ): Promise<SpaceEntity> {
+  ): Promise<Space> {
     const space = await this.spaceRepository.findOne({
       where: where,
       relations: relations,

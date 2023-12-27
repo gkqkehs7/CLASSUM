@@ -1,6 +1,6 @@
 import { ReplyChatEntity } from '../entities/replyChat.entity';
 
-interface ReplyChats extends ReplyChatEntity {}
+interface ReplyChat extends ReplyChatEntity {}
 
 interface CreateReplyChatDAO {
   content: string;
@@ -10,4 +10,4 @@ interface CreateReplyChatDAO {
   chatId: number;
 }
 
-export { ReplyChats, CreateReplyChatDAO };
+export { ReplyChat, CreateReplyChatDAO };

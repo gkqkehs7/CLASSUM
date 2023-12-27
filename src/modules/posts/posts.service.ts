@@ -6,6 +6,7 @@ import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.
 import { SuccessResponse } from '../../interfaces/common.interfaces';
 import {
   CreatePostDAO,
+  Post,
   PostWithChats,
 } from '../../interfaces/posts.interfaces';
 import { SpacesService } from '../spaces/spaces.service';
@@ -29,7 +30,7 @@ export class PostsService {
   async createPostEntity(
     createPostDAO: CreatePostDAO,
     queryRunner: QueryRunner,
-  ): Promise<PostEntity> {
+  ): Promise<Post> {
     const { title, content, anonymous, postType, userId, spaceId } =
       createPostDAO;
 
@@ -58,7 +59,7 @@ export class PostsService {
   async getPostEntity(
     where: { [key: string]: any },
     relations: string[] | null,
-  ): Promise<PostEntity> {
+  ): Promise<Post> {
     const post = await this.postRepository.findOne({
       where: where,
       relations: relations,
