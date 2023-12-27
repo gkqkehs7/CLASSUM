@@ -26,7 +26,7 @@ import { SpaceMembersModule } from '../space.member/space.members.module';
     UsersModule,
     SpaceMembersModule,
     forwardRef(() => SpaceRolesModule),
-    PostsModule,
+    forwardRef(() => PostsModule),
     ChatsModule,
     ReplyChatsModule,
   ],
