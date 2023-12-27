@@ -18,7 +18,6 @@ import { UpdateUserSpaceRoleRequestDto } from './request.dto/update.user.space.r
 import { SpaceRolesService } from '../space.roles/space.roles.service';
 import { DeleteSpaceRoleRequestDto } from './request.dto/delete.space.role.request.dto';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
-import { GetMySpacesResponseDto } from './response.dto/get.my.spaces.response.dto';
 import { CreatePostRequestDto } from './request.dto/create.post.request.dto';
 import { PostType } from '../../entities/post.entity';
 import { PostsService } from '../posts/posts.service';
@@ -27,6 +26,7 @@ import { ChatsService } from '../chat/chats.service';
 import { ReplyChatsService } from '../reply.chats/reply.chats.service';
 import { CreateChatRequestDto } from './request.dto/create.chat.request.dto';
 import { CreateReplyChatRequestDto } from './request.dto/create.reply.chat.request.dto';
+import { GetPostResponseDto } from './response.dto/get.post.response.dto';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -177,7 +177,7 @@ export class SpacesController {
       parseInt(postId),
     );
 
-    return response;
+    return new GetPostResponseDto(response);
   }
 
   @ApiOperation({

@@ -177,39 +177,34 @@ export class PostsService {
     const isMember = await this.spaceMembersService.isMember(userId, spaceId);
 
     if (!isMember) {
-      throw new Error('멤버만 글을 가져올 수 있습니다.');
+      throw new Error('space 멤버만 글을 가져올 수 있습니다.');
     }
 
-    // const role = spaceMember.roleType;
-    //
-    // if (post.anonymous) {
-    //   post.user =
-    //     role === SpaceRoleType.ADMIN || post.userId === userId
-    //       ? post.user
-    //       : null;
-    // }
-    //
-    // post.chats = post.chats.map((chat) => {
-    //   chat.replyChats = chat.replyChats.map((replyChat) => {
-    //     if (replyChat.anonymous) {
-    //       replyChat.user =
-    //         role === SpaceRoleType.ADMIN && replyChat.userId === userId
-    //           ? replyChat.user
-    //           : null;
-    //     }
-    //
-    //     return replyChat;
-    //   });
-    //
-    //   if (chat.anonymous) {
-    //     chat.user =
-    //       role === SpaceRoleType.ADMIN && chat.userId === userId
-    //         ? chat.user
-    //         : null;
-    //   }
-    //
-    //   return chat;
-    // });
+    // 관리자 인지 확인
+    const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
+
+    if (post.anonymous) {
+      post.user = isAdmin || post.userId === userId ? post.user : null;
+    }
+
+    post.chats = post.chats.map((chat) => {
+      // 익명성 답글들 보여줄지 여부, 익명이면 null 처리
+      chat.replyChats = chat.replyChats.map((replyChat) => {
+        if (replyChat.anonymous) {
+          replyChat.user =
+            isAdmin && replyChat.userId === userId ? replyChat.user : null;
+        }
+
+        return replyChat;
+      });
+
+      // 익명성 댓글들 보여줄지 여부, 익명이면 null 처리
+      if (chat.anonymous) {
+        chat.user = isAdmin && chat.userId === userId ? chat.user : null;
+      }
+
+      return chat;
+    });
 
     return post;
   }

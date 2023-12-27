@@ -1,5 +1,5 @@
 import { PostEntity, PostType } from '../entities/post.entity';
-import { ChatWithReplyChats } from './chats.interfaces';
+import { ChatWithUser } from './chats.interfaces';
 import { User } from './users.interfaces';
 
 interface Post extends PostEntity {}
@@ -14,8 +14,8 @@ interface CreatePostDAO {
 }
 
 interface PostWithChats extends Post {
-  user: User;
-  chats: ChatWithReplyChats[];
+  user: User | null;
+  chats: ChatWithUser[];
 }
 
 export { Post, CreatePostDAO, PostWithChats };
