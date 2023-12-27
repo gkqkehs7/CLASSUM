@@ -6,7 +6,6 @@ import {
 import { QueryRunner, Repository } from 'typeorm';
 import { SpaceRoleEntity } from '../../entities/spaceRole.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SpaceEntity } from '../../entities/space.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import { DeleteSpaceRoleRequestDto } from '../spaces/request.dto/delete.space.role.request.dto';
 import { UpdateUserSpaceRoleRequestDto } from '../spaces/request.dto/update.user.space.role.request.dto';
@@ -17,12 +16,10 @@ import { SuccessResponse } from '../../interfaces/common.interfaces';
 @Injectable()
 export class SpaceRolesService {
   constructor(
-    @InjectRepository(SpaceEntity)
-    private spaceRepository: Repository<SpaceEntity>,
-    @InjectRepository(SpaceRoleEntity)
-    private spaceRoleRepository: Repository<SpaceRoleEntity>,
     @InjectRepository(SpaceMemberEntity)
     private spaceMemberRepository: Repository<SpaceMemberEntity>,
+    @InjectRepository(SpaceRoleEntity)
+    private spaceRolesRepository: Repository<SpaceRoleEntity>,
     @Inject(forwardRef(() => SpacesService))
     private readonly spacesService: SpacesService,
     private readonly spaceMembersService: SpaceMembersService,
@@ -47,7 +44,7 @@ export class SpaceRolesService {
     if (queryRunner) {
       await queryRunner.manager.getRepository(SpaceRoleEntity).save(spaceRole);
     } else {
-      await this.spaceRoleRepository.save(spaceRole);
+      await this.spaceRolesRepository.save(spaceRole);
     }
 
     return spaceRole;
@@ -62,7 +59,7 @@ export class SpaceRolesService {
     where: { [key: string]: any },
     relations: string[] | null,
   ): Promise<SpaceRole> {
-    const spaceRole = await this.spaceRoleRepository.findOne({
+    const spaceRole = await this.spaceRolesRepository.findOne({
       where: where,
       relations: relations,
     });
@@ -88,7 +85,7 @@ export class SpaceRolesService {
         .getRepository(SpaceRoleEntity)
         .softRemove(spaceRole);
     } else {
-      await this.spaceRepository.softRemove(spaceRole);
+      await this.spaceRolesRepository.softRemove(spaceRole);
     }
   }
 

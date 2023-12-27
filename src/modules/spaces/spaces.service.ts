@@ -3,31 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection, QueryRunner } from 'typeorm';
 import { CreateSpaceRequestDto } from './request.dto/create.space.request.dto';
 import { SpaceEntity } from '../../entities/space.entity';
-import {
-  SpaceRoleEntity,
-  SpaceRoleType,
-} from '../../entities/spaceRole.entity';
-import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
+import { SpaceRoleType } from '../../entities/spaceRole.entity';
 import { CreateSpaceDAO, Space } from '../../interfaces/spaces.interfaces';
-import { UsersService } from '../users/users.service';
 import { SpaceRolesService } from '../space.roles/space.roles.service';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
-import { UserEntity } from '../../entities/user.entity';
 import { SuccessResponse } from '../../interfaces/common.interfaces';
 import { SpaceMembersService } from '../space.member/space.members.service';
 
 @Injectable()
 export class SpacesService {
   constructor(
-    @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
     @InjectRepository(SpaceEntity)
     private spaceRepository: Repository<SpaceEntity>,
-    @InjectRepository(SpaceRoleEntity)
-    private spaceRoleRepository: Repository<SpaceRoleEntity>,
-    @InjectRepository(SpaceRoleEntity)
-    private spaceMemberRepository: Repository<SpaceMemberEntity>,
-    private usersService: UsersService,
     @Inject(forwardRef(() => SpaceRolesService))
     private spaceRolesService: SpaceRolesService,
     private spaceMembersService: SpaceMembersService,
@@ -175,17 +162,6 @@ export class SpacesService {
     } finally {
       await queryRunner.release();
     }
-  }
-
-  async getSpaces(userId: number): Promise<Space[]> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['spaces'],
-    });
-
-    if (user.spaces.length === 0) return [];
-
-    return user.spaces;
   }
 
   /**

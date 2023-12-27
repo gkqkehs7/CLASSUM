@@ -57,19 +57,6 @@ export class SpacesController {
   }
 
   @ApiOperation({
-    summary: '내가 참여하고 있는 space 가져오기',
-  })
-  @UseGuards(AccessTokenGuard)
-  @Get('/me')
-  async getSpaces(@Req() request): Promise<GetMySpacesResponseDto> {
-    const response = await this.spacesService.getSpaces(
-      parseInt(request.userId),
-    );
-
-    return new GetMySpacesResponseDto(response);
-  }
-
-  @ApiOperation({
     summary: 'space 삭제',
   })
   @UseGuards(AccessTokenGuard)

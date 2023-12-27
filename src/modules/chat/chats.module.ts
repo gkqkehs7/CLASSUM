@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../../entities/user.entity';
@@ -20,7 +20,7 @@ import { PostsModule } from '../posts/posts.module';
       ChatEntity,
     ]),
     PostsModule,
-    SpacesModule,
+    forwardRef(() => SpacesModule),
     SpaceMembersModule,
   ],
   exports: [ChatsService],
