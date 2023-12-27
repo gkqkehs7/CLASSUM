@@ -3,12 +3,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository } from 'typeorm';
 import { UserEntity } from '../../entities/user.entity';
 import { CreateUserDAO, User } from '../../interfaces/users.interfaces';
+import { PostsService } from '../posts/posts.service';
+import { ChatsService } from '../chat/chats.service';
+import { SpacesService } from '../spaces/spaces.service';
+import { ReplyChatsService } from '../reply.chats/reply.chats.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    private readonly spacesService: SpacesService,
+    private readonly postsService: PostsService,
+    private readonly chatsService: ChatsService,
+    private readonly replyChatsService: ReplyChatsService,
   ) {}
 
   /**
@@ -70,5 +78,47 @@ export class UsersService {
 
     // boolean casting
     return !!isExist;
+  }
+
+  /**
+   * 다른 사람 프로필 가져오기
+   * @param userId
+   */
+  async getUserInfo(userId: number, otherId: number): Promise<User> {
+    const user = await this.getUserEntity({ id: otherId }, null);
+
+    return user;
+  }
+
+  /**
+   * 자신의 프로필 가져오기
+   * @param userId
+   */
+  async getMyInfo(userId: number): Promise<User> {
+    return await this.getUserEntity({ id: userId }, null);
+  }
+
+  /**
+   * 나의 공간들 가져오기
+   * @param userId
+   */
+  async getMySpaces(userId: number) {
+    console.log('hi');
+  }
+
+  /**
+   * 내가 작성한 게시글들 가져오기
+   * @param userId
+   */
+  async getMyPosts(userId: number) {
+    console.log('hi');
+  }
+
+  /**
+   * 내가 작성한 댓글들 가져오기
+   * @param userId
+   */
+  async getMyChats(userId: number) {
+    console.log('hi');
   }
 }
