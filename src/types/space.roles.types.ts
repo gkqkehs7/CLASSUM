@@ -1,6 +1,9 @@
+import { SpaceRoleType } from '../entities/spaceRole.entity';
+
 interface CreateSpaceRoleDAO {
   spaceId: number;
   roleName: string;
+  roleType: SpaceRoleType;
 }
 
 interface DeleteSpaceRoleResponse {

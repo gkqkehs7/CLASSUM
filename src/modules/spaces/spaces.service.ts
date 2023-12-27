@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection, QueryRunner } from 'typeorm';
 import { CreateSpaceRequestDto } from './request.dto/create.space.request.dto';
@@ -8,12 +8,13 @@ import {
   SpaceRoleType,
 } from '../../entities/spaceRole.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
-import { CreateSpaceMemberDAO, Space } from '../../types/spaces.types';
+import { CreateSpaceDAO, Space } from '../../types/spaces.types';
 import { UsersService } from '../users/users.service';
-import { SpaceRolesService } from '../spaceRole/spaceRoles.service';
+import { SpaceRolesService } from '../space.roles/space.roles.service';
 import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
 import { UserEntity } from '../../entities/user.entity';
 import { SuccessResponse } from '../../types/common.types';
+import { SpaceMembersService } from '../space.member/space.members.service';
 
 @Injectable()
 export class SpacesService {
@@ -27,9 +28,74 @@ export class SpacesService {
     @InjectRepository(SpaceRoleEntity)
     private spaceMemberRepository: Repository<SpaceMemberEntity>,
     private usersService: UsersService,
+    @Inject(forwardRef(() => SpaceRolesService))
     private spaceRolesService: SpaceRolesService,
+    private spaceMembersService: SpaceMembersService,
     private readonly connection: Connection,
   ) {}
+
+  /**
+   * spaceEntity 생성
+   * @param createSpaceDAO
+   * @param queryRunner
+   */
+  async createSpaceEntity(
+    createSpaceDAO: CreateSpaceDAO,
+    queryRunner: QueryRunner,
+  ): Promise<SpaceEntity> {
+    const { name, logo, code, adminCode } = createSpaceDAO;
+
+    const space = new SpaceEntity();
+    space.name = name;
+    space.logo = logo;
+    space.code = code;
+    space.adminCode = adminCode;
+
+    if (queryRunner) {
+      await queryRunner.manager.getRepository(SpaceEntity).save(space);
+    } else {
+      await this.spaceRepository.save(space);
+    }
+
+    return space;
+  }
+
+  /**
+   * spaceEntity 가져오기
+   * @param where
+   * @param relations
+   */
+  async getSpaceEntity(
+    where: { [key: string]: any },
+    relations: string[] | null,
+  ): Promise<SpaceEntity> {
+    const space = await this.spaceRepository.findOne({
+      where: where,
+      relations: relations,
+    });
+
+    if (!space) {
+      throw new Error('존재하지 않는 space 입니다.');
+    }
+
+    return space;
+  }
+
+  /**
+   * spaceEntity 삭제
+   * @param space
+   * @param queryRunner
+   */
+  async deleteSpaceEntity(
+    space: SpaceEntity,
+    queryRunner: QueryRunner,
+  ): Promise<void> {
+    if (queryRunner) {
+      await queryRunner.manager.getRepository(SpaceEntity).softRemove(space);
+    } else {
+      await this.spaceRepository.softRemove(space);
+    }
+  }
 
   /**
    * space 생성
@@ -40,40 +106,62 @@ export class SpacesService {
     userId: number,
     createSpaceRequestDto: CreateSpaceRequestDto,
   ): Promise<SuccessResponse> {
-    const { name, logo, code, adminCode, roleNames } = createSpaceRequestDto;
+    const {
+      name,
+      logo,
+      code,
+      adminCode,
+      roleName,
+      adminRoleNames,
+      partRoleNames,
+    } = createSpaceRequestDto;
 
     const queryRunner = await this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const space = new SpaceEntity();
-      space.name = name;
-      space.logo = logo;
-      space.code = code;
-      space.adminCode = adminCode;
-
-      await queryRunner.manager.getRepository(SpaceEntity).save(space);
+      // spaceEntity 생성
+      const space = await this.createSpaceEntity(
+        {
+          name: name,
+          logo: logo,
+          code: code,
+          adminCode: adminCode,
+        },
+        queryRunner,
+      );
 
       // space 역할들 생성
-      await Promise.all(
-        roleNames.map(async (roleName) => {
-          await this.spaceRolesService.createSpaceRole(
+      await Promise.all([
+        adminRoleNames.map(async (roleName) => {
+          await this.spaceRolesService.createSpaceRoleEntity(
             {
               spaceId: space.id,
               roleName: roleName,
+              roleType: SpaceRoleType.ADMIN,
             },
             queryRunner,
           );
         }),
-      );
+        partRoleNames.map(async (roleName) => {
+          await this.spaceRolesService.createSpaceRoleEntity(
+            {
+              spaceId: space.id,
+              roleName: roleName,
+              roleType: SpaceRoleType.PARTICIPANT,
+            },
+            queryRunner,
+          );
+        }),
+      ]);
 
-      // 관리자로 자신 추가
-      await this.addSpaceMember(
+      // spaceMemberEntity 생성, 관리자로 자신 추가
+      await this.spaceMembersService.createSpaceMemberEntity(
         {
           userId: userId,
           spaceId: space.id,
-          roleName: 'ADMIN',
+          roleName: roleName,
           roleType: SpaceRoleType.ADMIN,
         },
         queryRunner,
@@ -101,37 +189,33 @@ export class SpacesService {
   }
 
   /**
-   * space 생성
+   * space 삭제
    * @param userId
    * @param spaceId
    */
   async deleteSpace(userId: number, spaceId: number): Promise<SuccessResponse> {
-    const space = await this.spaceRepository.findOne({
-      where: { id: spaceId },
-      relations: ['posts', 'spaceRoles'],
-    });
+    const space = await this.getSpaceEntity({ id: spaceId }, [
+      'posts',
+      'spaceRoles',
+    ]);
 
-    if (!space) {
-      throw new Error('존재하지 않는 space 입니다.');
-    }
+    const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
 
-    const spaceMember = await this.spaceMemberRepository.findOne({
-      where: { userId: userId, spaceId: spaceId },
-    });
-
-    if (!spaceMember) {
-      throw new Error('space의 member가 아닙니다.');
-    }
-
-    if (spaceMember.roleType !== SpaceRoleType.ADMIN) {
+    if (!isAdmin) {
       throw new Error('관리자만 space를 삭제할 수 있습니다.');
     }
 
-    await this.spaceRepository.softRemove(space);
+    await this.deleteSpaceEntity(space, null);
 
     return { success: true };
   }
 
+  /**
+   * space 입장
+   * @param userId
+   * @param spaceId
+   * @param entranceSpaceRequestDto
+   */
   async entranceSpace(
     userId: number,
     spaceId: number,
@@ -139,21 +223,9 @@ export class SpacesService {
   ): Promise<SuccessResponse> {
     const { entranceCode } = entranceSpaceRequestDto;
 
-    const space = await this.spaceRepository.findOne({
-      where: { id: spaceId },
-    });
+    const space = await this.getSpaceEntity({ id: spaceId }, null);
 
-    if (!space) {
-      throw new Error('존재하지 않는 space 입니다.');
-    }
-
-    const spaceMember = await this.spaceMemberRepository.findOne({
-      where: { userId: userId, spaceId: spaceId },
-    });
-
-    if (!spaceMember) {
-      throw new Error('space의 member가 아닙니다.');
-    }
+    const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
 
     const { code, adminCode } = space;
 
@@ -162,35 +234,10 @@ export class SpacesService {
     }
 
     if (entranceCode === adminCode) {
-      if (spaceMember.roleType !== SpaceRoleType.ADMIN) {
+      if (!isAdmin) {
         throw new Error('관리자만 관리자 코드로 입장 가능합니다.');
       }
     }
-
-    return { success: true };
-  }
-
-  /**
-   * space에 member 추가
-   * @param createSpaceMemberDAO
-   * @param queryRunner
-   */
-  async addSpaceMember(
-    createSpaceMemberDAO: CreateSpaceMemberDAO,
-    queryRunner: QueryRunner,
-  ): Promise<SuccessResponse> {
-    const { userId, spaceId, roleName, roleType } = createSpaceMemberDAO;
-
-    const spaceMember = new SpaceMemberEntity();
-
-    spaceMember.userId = userId;
-    spaceMember.spaceId = spaceId;
-    spaceMember.roleName = roleName;
-    spaceMember.roleType = roleType;
-
-    await queryRunner.manager
-      .getRepository(SpaceMemberEntity)
-      .save(spaceMember);
 
     return { success: true };
   }
