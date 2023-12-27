@@ -1,30 +1,99 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SpaceEntity } from '../../entities/space.entity';
-import { Repository } from 'typeorm';
-import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
-import { PostEntity } from '../../entities/post.entity';
-import { ChatEntity } from '../../entities/chat.entity';
+import { QueryRunner, Repository } from 'typeorm';
 import { CreateReplyChatRequestDto } from '../spaces/request.dto/create.reply.chat.request.dto';
 import { ReplyChatEntity } from '../../entities/replyChat.entity';
 import { SuccessResponse } from '../../types/common.types';
-import { SpaceRoleType } from '../../entities/spaceRole.entity';
+import { PostsService } from '../posts/posts.service';
+import { SpacesService } from '../spaces/spaces.service';
+import { SpaceMembersService } from '../space.member/space.members.service';
+import { ChatsService } from '../chat/chats.service';
+import { CreateReplyChatDAO } from '../../types/reply.chats.types';
 
 @Injectable()
 export class ReplyChatsService {
   constructor(
-    @InjectRepository(SpaceEntity)
-    private spaceRepository: Repository<SpaceEntity>,
-    @InjectRepository(SpaceMemberEntity)
-    private spaceMemberRepository: Repository<SpaceMemberEntity>,
-    @InjectRepository(PostEntity)
-    private postRepository: Repository<PostEntity>,
-    @InjectRepository(ChatEntity)
-    private chatRepository: Repository<ChatEntity>,
     @InjectRepository(ReplyChatEntity)
     private replyChatRepository: Repository<ReplyChatEntity>,
+    private readonly postsService: PostsService,
+    private readonly chatsService: ChatsService,
+    private readonly spacesService: SpacesService,
+    private readonly spaceMembersService: SpaceMembersService,
   ) {}
 
+  /**
+   * replyChatEntity 생성
+   * @param createReplyChatDAO
+   * @param queryRunner
+   */
+  async createReplyChatEntity(
+    createReplyChatDAO: CreateReplyChatDAO,
+    queryRunner: QueryRunner,
+  ): Promise<ReplyChatEntity> {
+    const { content, anonymous, userId, chatId } = createReplyChatDAO;
+
+    const replyChat = new ReplyChatEntity();
+    replyChat.content = content;
+    replyChat.anonymous = anonymous;
+    replyChat.userId = userId;
+    replyChat.chatId = chatId;
+
+    if (queryRunner) {
+      await queryRunner.manager.getRepository(ReplyChatEntity).save(replyChat);
+    } else {
+      await this.replyChatRepository.save(replyChat);
+    }
+
+    return replyChat;
+  }
+
+  /**
+   * replyChatEntity 가져오기
+   * @param where
+   * @param relations
+   */
+  async getReplyChatEntity(
+    where: { [key: string]: any },
+    relations: string[] | null,
+  ): Promise<ReplyChatEntity> {
+    const replyChat = await this.replyChatRepository.findOne({
+      where: where,
+      relations: relations,
+    });
+
+    if (!replyChat) {
+      throw new Error('존재하지 않는 replyChat 입니다.');
+    }
+
+    return replyChat;
+  }
+
+  /**
+   * replyChatEntity 삭제
+   * @param replyChat
+   * @param queryRunner
+   */
+  async deleteReplyChatEntity(
+    replyChat: ReplyChatEntity,
+    queryRunner: QueryRunner,
+  ) {
+    if (queryRunner) {
+      await queryRunner.manager
+        .getRepository(ReplyChatEntity)
+        .softRemove(replyChat);
+    } else {
+      await this.replyChatRepository.softRemove(replyChat);
+    }
+  }
+
+  /**
+   * replyChat 생성
+   * @param userId
+   * @param spaceId
+   * @param postId
+   * @param chatId
+   * @param createReplyChatRequestDto
+   */
   async createReplyChat(
     userId: number,
     spaceId: number,
@@ -34,47 +103,54 @@ export class ReplyChatsService {
   ): Promise<SuccessResponse> {
     const { content, anonymous } = createReplyChatRequestDto;
 
-    const space = await this.spaceRepository.findOne({
-      where: { id: spaceId },
-    });
+    // 존재하는 space인지 확인
+    await this.spacesService.getSpaceEntity({ id: spaceId }, null);
 
-    if (!space) {
-      throw new Error('존재하지 않는 space 입니다.');
-    }
+    // 존재하는 post인지 확인
+    await this.postsService.getPostEntity({ id: postId }, null);
 
-    const spaceMember = await this.spaceMemberRepository.findOne({
-      where: { userId: userId, spaceId: spaceId },
-    });
+    // space member만 작성 가능
+    const isMember = await this.spaceMembersService.isMember(userId, spaceId);
 
-    if (!spaceMember) {
+    if (!isMember) {
       throw new Error('space 멤버만 댓글을 작성할 수 있습니다.');
     }
 
-    const role = spaceMember.roleType;
+    // 익명인 경우 참여자만 작성 가능
+    if (anonymous) {
+      const isParticipate = await this.spaceMembersService.isParticipate(
+        userId,
+        spaceId,
+      );
 
-    if (anonymous && role === SpaceRoleType.ADMIN) {
-      throw new Error('참여자만 댓글을 익명으로 작성할 수 있습니다.');
+      if (!isParticipate) {
+        throw new Error('참여자만 댓글을 익명으로 작성할 수 있습니다.');
+      }
     }
 
-    const post = await this.postRepository.findOne({
-      where: { id: postId },
-    });
-
-    if (!post) {
-      throw new Error('존재하지 않는 게시글입니다.');
-    }
-
-    const replyChat = new ReplyChatEntity();
-    replyChat.content = content;
-    replyChat.anonymous = anonymous;
-    replyChat.userId = userId;
-    replyChat.chatId = postId;
-
-    await this.replyChatRepository.save(replyChat);
+    // replyChatEntity 생성
+    await this.createReplyChatEntity(
+      {
+        content: content,
+        anonymous: anonymous,
+        userId: userId,
+        postId: 1,
+        chatId: chatId,
+      },
+      null,
+    );
 
     return { success: true };
   }
 
+  /**
+   * replyChat 삭제
+   * @param userId
+   * @param spaceId
+   * @param postId
+   * @param chatId
+   * @param replyChatId
+   */
   async deleteReplyChat(
     userId: number,
     spaceId: number,
@@ -82,31 +158,19 @@ export class ReplyChatsService {
     chatId: number,
     replyChatId: number,
   ): Promise<SuccessResponse> {
-    const post = await this.postRepository.findOne({
-      where: { id: postId },
-    });
+    // 존재하는 space인지 확인
+    await this.spacesService.getSpaceEntity({ id: spaceId }, null);
 
-    if (!post) {
-      throw new Error('존재하지 않는 게시글입니다.');
-    }
+    // 존재하는 post인지 확인
+    await this.postsService.getPostEntity({ id: postId }, null);
 
-    const chat = await this.chatRepository.findOne({
-      where: { id: chatId },
-    });
+    // 존재하는 chat인지 확인
+    await this.chatsService.getChatEntity({ id: chatId }, ['replyChats']);
 
-    if (!chat) {
-      throw new Error('존재하지 않는 댓글입니다.');
-    }
+    // 존재하는 replyChat인지 확인
+    const replyChat = await this.getReplyChatEntity({ id: chatId }, null);
 
-    const replyChat = await this.replyChatRepository.findOne({
-      where: { id: replyChatId },
-    });
-
-    if (!replyChat) {
-      throw new Error('존재하지 않는 답글입니다.');
-    }
-
-    await this.replyChatRepository.softRemove(replyChat);
+    await this.deleteReplyChatEntity(replyChat, null);
 
     return { success: true };
   }
