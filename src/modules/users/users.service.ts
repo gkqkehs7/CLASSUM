@@ -7,6 +7,7 @@ import { PostsService } from '../posts/posts.service';
 import { ChatsService } from '../chat/chats.service';
 import { SpacesService } from '../spaces/spaces.service';
 import { ReplyChatsService } from '../reply.chats/reply.chats.service';
+import { Space } from '../../interfaces/spaces.interfaces';
 
 @Injectable()
 export class UsersService {
@@ -85,9 +86,7 @@ export class UsersService {
    * @param userId
    */
   async getUserInfo(userId: number, otherId: number): Promise<User> {
-    const user = await this.getUserEntity({ id: otherId }, null);
-
-    return user;
+    return await this.getUserEntity({ id: otherId }, null);
   }
 
   /**
@@ -102,8 +101,14 @@ export class UsersService {
    * 나의 공간들 가져오기
    * @param userId
    */
-  async getMySpaces(userId: number) {
-    console.log('hi');
+  async getMySpaces(userId: number): Promise<Space[]> {
+    const user = await this.getUserEntity({ id: userId }, ['spaces']);
+
+    if (user.spaces.length === 0) {
+      return [];
+    }
+
+    return user.spaces;
   }
 
   /**

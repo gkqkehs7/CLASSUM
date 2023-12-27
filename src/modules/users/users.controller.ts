@@ -4,6 +4,7 @@ import { AccessTokenGuard } from '../../guards/access.token.guards';
 import { UsersService } from './users.service';
 import { GetMyInfoResponseDto } from './dto/get.my.info.response.dto';
 import { GetUserInfoResponseDto } from './dto/get.user.info.response.dto';
+import { GetMySpacesResponseDto } from './dto/get.my.spaces.response.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -43,8 +44,10 @@ export class UsersController {
   })
   @UseGuards(AccessTokenGuard)
   @Get('/me/spaces')
-  async getMySpaces(@Req() request) {
+  async getMySpaces(@Req() request): Promise<GetMySpacesResponseDto> {
     const response = await this.usersService.getMySpaces(request.userId);
+
+    return new GetMySpacesResponseDto(response);
   }
 
   @ApiOperation({
