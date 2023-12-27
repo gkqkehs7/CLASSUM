@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { QueryRunner, Repository } from 'typeorm';
-import {
-  SpaceRoleEntity,
-  SpaceRoleType,
-} from '../../entities/spaceRole.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SpaceEntity } from '../../entities/space.entity';
+import { QueryRunner, Repository } from 'typeorm';
+import { SpaceRoleType } from '../../entities/spaceRole.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import {
   CreateSpaceMemberDAO,
@@ -15,10 +11,6 @@ import {
 @Injectable()
 export class SpaceMembersService {
   constructor(
-    @InjectRepository(SpaceEntity)
-    private spaceRepository: Repository<SpaceEntity>,
-    @InjectRepository(SpaceRoleEntity)
-    private spaceRoleRepository: Repository<SpaceRoleEntity>,
     @InjectRepository(SpaceMemberEntity)
     private spaceMemberRepository: Repository<SpaceMemberEntity>,
   ) {}
