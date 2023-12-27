@@ -146,6 +146,12 @@ export class PostsService {
     return { success: true };
   }
 
+  /**
+   * post 가져오기
+   * @param userId
+   * @param spaceId
+   * @param postId
+   */
   async getPost(
     userId: number,
     spaceId: number,

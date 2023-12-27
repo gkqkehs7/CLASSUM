@@ -194,17 +194,20 @@ export class SpacesService {
    * @param spaceId
    */
   async deleteSpace(userId: number, spaceId: number): Promise<SuccessResponse> {
+    // 존재하는 space인지 확인
     const space = await this.getSpaceEntity({ id: spaceId }, [
       'posts',
       'spaceRoles',
     ]);
 
+    // 관리자만 space 삭제 가능
     const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
 
     if (!isAdmin) {
       throw new Error('관리자만 space를 삭제할 수 있습니다.');
     }
 
+    // spaceEntity 삭제
     await this.deleteSpaceEntity(space, null);
 
     return { success: true };
@@ -223,17 +226,20 @@ export class SpacesService {
   ): Promise<SuccessResponse> {
     const { entranceCode } = entranceSpaceRequestDto;
 
+    // 존재하는 space인지 확인
     const space = await this.getSpaceEntity({ id: spaceId }, null);
-
-    const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
 
     const { code, adminCode } = space;
 
+    // 코드가 맞는지 확인
     if (code !== entranceCode && adminCode !== entranceCode) {
       throw new Error('잘못된 코드 입니다.');
     }
 
     if (entranceCode === adminCode) {
+      // 관리자만 관리자 코드로 입장 가능
+      const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
+
       if (!isAdmin) {
         throw new Error('관리자만 관리자 코드로 입장 가능합니다.');
       }
