@@ -148,7 +148,7 @@ export class UsersService {
       const spaceId = alarm.spaceId;
 
       if (!alarmsGroupedBySpace[spaceId]) {
-        alarmsGroupedBySpace[spaceId] = [];
+        alarmsGroupedBySpace[spaceId] = [alarm];
       } else {
         alarmsGroupedBySpace[spaceId].push(alarm);
       }

@@ -101,10 +101,9 @@ export class ChatsService {
     const { content, anonymous } = createChatRequestDto;
 
     // 존재하는 space인지 확인
-    const space = await this.spacesService.getSpaceEntity(
-      { id: spaceId },
-      null,
-    );
+    const space = await this.spacesService.getSpaceEntity({ id: spaceId }, [
+      'members',
+    ]);
 
     // 존재하는 post인지 확인
     await this.postsService.getPostEntity({ id: postId }, null);
@@ -148,7 +147,7 @@ export class ChatsService {
       await Promise.all(
         space.members.map((user) => {
           if (user.id !== userId) {
-            this.alarmsService.createAlarmEntity(
+            return this.alarmsService.createAlarmEntity(
               {
                 userId: user.id,
                 spaceId: space.id,

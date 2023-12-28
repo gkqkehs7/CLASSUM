@@ -31,6 +31,4 @@ export class AlarmsService {
 
     return alarm;
   }
-
-  // async checkAlarm() {}
 }

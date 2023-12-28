@@ -88,7 +88,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: '내 알람들 가져오',
+    summary: '내 알람들 가져오기',
   })
   @UseGuards(AccessTokenGuard)
   @Get('/me/alarms')
