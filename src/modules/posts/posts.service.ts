@@ -192,7 +192,7 @@ export class PostsService {
       chat.replyChats = chat.replyChats.map((replyChat) => {
         if (replyChat.anonymous) {
           replyChat.user =
-            isAdmin && replyChat.userId === userId ? replyChat.user : null;
+            isAdmin || replyChat.userId === userId ? replyChat.user : null;
         }
 
         return replyChat;
@@ -200,7 +200,7 @@ export class PostsService {
 
       // 익명성 댓글들 보여줄지 여부, 익명이면 null 처리
       if (chat.anonymous) {
-        chat.user = isAdmin && chat.userId === userId ? chat.user : null;
+        chat.user = isAdmin || chat.userId === userId ? chat.user : null;
       }
 
       return chat;
@@ -226,7 +226,7 @@ export class PostsService {
     // 존재하는 post인지 확인
     const post = await this.getPostEntity({ id: postId }, [
       'chats',
-      'chat.replyChats',
+      'chats.replyChats',
       'images',
     ]);
 

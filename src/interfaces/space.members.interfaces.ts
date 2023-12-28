@@ -10,4 +10,9 @@ interface CreateSpaceMemberDAO {
   roleType: SpaceRoleType;
 }
 
-export { SpaceMember, CreateSpaceMemberDAO };
+interface UpdateSpaceMemberDAO {
+  roleName: string;
+  roleType: SpaceRoleType;
+}
+
+export { SpaceMember, CreateSpaceMemberDAO, UpdateSpaceMemberDAO };

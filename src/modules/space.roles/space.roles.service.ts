@@ -102,14 +102,17 @@ export class SpaceRolesService {
   ): Promise<SuccessResponse> {
     const { roleName } = deleteSpaceRoleRequestDto;
 
+    // 존재하는 space인지 확인
     await this.spacesService.getSpaceEntity({ id: spaceId }, ['spaceRoles']);
 
+    // 관리자인지 확인
     const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
 
     if (!isAdmin) {
       throw new Error('관리자만 spaceRole을 삭제할 수 있습니다.');
     }
 
+    // 존재하는 spaceRole인지 확인
     const spaceRole = await this.getSpaceRoleEntity(
       {
         spaceId: spaceId,
@@ -118,14 +121,16 @@ export class SpaceRolesService {
       null,
     );
 
+    // 유저가 spaceRole를 사용하고 있는지 확인
     const isUsed = await this.spaceMemberRepository.findOne({
       where: { spaceId: spaceId, roleName: roleName },
     });
 
-    if (!isUsed) {
+    if (isUsed) {
       throw new Error('해당 spaceRole을 사용하는 유저가 존재합니다.');
     }
 
+    // 사용하는 유저가 없을때만 spaceRole 삭제
     await this.deleteSpaceRoleEntity(spaceRole, null);
 
     return { success: true };
@@ -140,19 +145,27 @@ export class SpaceRolesService {
    */
   async updateUserSpaceRole(
     userId: number,
-    chageUserId: number,
+    memberId: number,
     spaceId: number,
     updateUserSpaceRoleRequestDto: UpdateUserSpaceRoleRequestDto,
   ): Promise<SuccessResponse> {
     const { roleName, roleType } = updateUserSpaceRoleRequestDto;
 
+    // 존재하는 space인지 확인
     await this.spacesService.getSpaceEntity({ id: spaceId }, null);
 
+    // 관리자인지 확인
     const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
 
     if (!isAdmin) {
       throw new Error('관리자만 spaceRole을 변경할 수 있습니다.');
     }
+
+    // 역할을 바꾸려는 유저가 space의 member인지 확인
+    const spaceMember = await this.spaceMembersService.getSpaceMemberEntity(
+      memberId,
+      spaceId,
+    );
 
     // 해당 역할이 존재하는지 확인
     await this.getSpaceRoleEntity(
@@ -160,19 +173,15 @@ export class SpaceRolesService {
       null,
     );
 
-    const isMember = await this.spaceMembersService.isMember(
-      chageUserId,
-      spaceId,
+    // 유저의 역할 변경
+    await this.spaceMembersService.updateSpaceMemberEntity(
+      spaceMember,
+      {
+        roleName: roleName,
+        roleType: roleType,
+      },
+      null,
     );
-
-    if (!isMember) {
-      throw new Error('space의 member가 아닙니다.');
-    }
-
-    // changeMember.roleName = roleName;
-    // changeMember.roleType = roleType;
-    //
-    // await this.spaceMemberRepository.save(changeMember);
 
     return { success: true };
   }
