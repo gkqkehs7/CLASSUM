@@ -1,14 +1,14 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection, QueryRunner } from 'typeorm';
-import { CreateSpaceRequestDto } from './request.dto/create.space.request.dto';
 import { SpaceEntity } from '../../entities/space.entity';
 import { SpaceRoleType } from '../../entities/spaceRole.entity';
-import { CreateSpaceDAO, Space } from '../../interfaces/spaces.interfaces';
-import { SpaceRolesService } from '../space.roles/space.roles.service';
-import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
-import { SuccessResponse } from '../../interfaces/common.interfaces';
 import { SpaceMembersService } from '../space.member/space.members.service';
+import { SpaceRolesService } from '../space.roles/space.roles.service';
+import { CreateSpaceRequestDto } from './request.dto/create.space.request.dto';
+import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
+import { CreateSpaceDAO, Space } from '../../interfaces/spaces.interfaces';
+import { SuccessResponse } from '../../interfaces/common.interfaces';
 
 @Injectable()
 export class SpacesService {

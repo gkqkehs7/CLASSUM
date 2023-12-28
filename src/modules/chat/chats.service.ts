@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, QueryRunner, Repository } from 'typeorm';
+
 import { ChatEntity } from '../../entities/chat.entity';
-import { SuccessResponse } from '../../interfaces/common.interfaces';
+
 import { CreateChatRequestDto } from '../spaces/request.dto/create.chat.request.dto';
+import { SuccessResponse } from '../../interfaces/common.interfaces';
 import { Chat, CreateChatDAO } from '../../interfaces/chats.interfaces';
+
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
 import { PostsService } from '../posts/posts.service';

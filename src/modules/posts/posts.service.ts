@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, QueryRunner, Repository } from 'typeorm';
 import { PostEntity, PostType } from '../../entities/post.entity';
-import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
 import { SuccessResponse } from '../../interfaces/common.interfaces';
 import {
   CreatePostDAO,
@@ -13,6 +12,7 @@ import {
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
 import { AlarmsService } from '../alarms/alarms.service';
+import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
 import { UpdatePostRequestDto } from '../spaces/request.dto/update.post.request.dto';
 
 @Injectable()
@@ -396,7 +396,6 @@ export class PostsService {
     const post = await this.getPostEntity({ id: postId }, [
       'chats',
       'chats.replyChats',
-      'images',
     ]);
 
     // 관리자인지 확인

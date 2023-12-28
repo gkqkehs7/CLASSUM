@@ -3,15 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository } from 'typeorm';
 import { UserEntity } from '../../entities/user.entity';
 import { CreateUserDAO, User } from '../../interfaces/users.interfaces';
-import { PostsService } from '../posts/posts.service';
-import { ChatsService } from '../chat/chats.service';
-import { SpacesService } from '../spaces/spaces.service';
-import { ReplyChatsService } from '../reply.chats/reply.chats.service';
 import { Space } from '../../interfaces/spaces.interfaces';
 import { Post } from '../../interfaces/posts.interfaces';
 import { Chat } from '../../interfaces/chats.interfaces';
 import { ReplyChat } from '../../interfaces/reply.chats.interfaces';
-import { AlarmEntity } from '../../entities/alarm.entity';
 import { Alarm } from '../../interfaces/alarm.interfaces';
 
 @Injectable()

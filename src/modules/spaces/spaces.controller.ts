@@ -12,24 +12,24 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SpacesService } from './spaces.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AccessTokenGuard } from '../../guards/access.token.guards';
-import { CreateSpaceRequestDto } from './request.dto/create.space.request.dto';
-import { UpdateUserSpaceRoleRequestDto } from './request.dto/update.user.space.role.request.dto';
-import { SpaceRolesService } from '../space.roles/space.roles.service';
-import { DeleteSpaceRoleRequestDto } from './request.dto/delete.space.role.request.dto';
-import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
-import { CreatePostRequestDto } from './request.dto/create.post.request.dto';
 import { PostType } from '../../entities/post.entity';
-import { PostsService } from '../posts/posts.service';
-import { SuccessResponseDto } from '../dto/success.response.dto';
+import { SpacesService } from './spaces.service';
+import { SpaceRolesService } from '../space.roles/space.roles.service';
 import { ChatsService } from '../chat/chats.service';
+import { PostsService } from '../posts/posts.service';
 import { ReplyChatsService } from '../reply.chats/reply.chats.service';
+import { CreateSpaceRequestDto } from './request.dto/create.space.request.dto';
+import { CreatePostRequestDto } from './request.dto/create.post.request.dto';
 import { CreateChatRequestDto } from './request.dto/create.chat.request.dto';
 import { CreateReplyChatRequestDto } from './request.dto/create.reply.chat.request.dto';
-import { GetPostResponseDto } from './response.dto/get.post.response.dto';
 import { UpdatePostRequestDto } from './request.dto/update.post.request.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateUserSpaceRoleRequestDto } from './request.dto/update.user.space.role.request.dto';
+import { DeleteSpaceRoleRequestDto } from './request.dto/delete.space.role.request.dto';
+import { EntranceSpaceRequestDto } from './request.dto/entrance.space.request.dto';
+import { GetPostResponseDto } from './response.dto/get.post.response.dto';
+import { SuccessResponseDto } from '../dto/success.response.dto';
 
 @ApiTags('spaces')
 @Controller('spaces')

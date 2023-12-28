@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, QueryRunner, Repository } from 'typeorm';
-import { CreateReplyChatRequestDto } from '../spaces/request.dto/create.reply.chat.request.dto';
 import { ReplyChatEntity } from '../../entities/replyChat.entity';
-import { SuccessResponse } from '../../interfaces/common.interfaces';
 import { PostsService } from '../posts/posts.service';
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
 import { ChatsService } from '../chat/chats.service';
+import { AlarmsService } from '../alarms/alarms.service';
 import {
   CreateReplyChatDAO,
   ReplyChat,
 } from '../../interfaces/reply.chats.interfaces';
-import { AlarmsService } from '../alarms/alarms.service';
+
+import { SuccessResponse } from '../../interfaces/common.interfaces';
+import { CreateReplyChatRequestDto } from '../spaces/request.dto/create.reply.chat.request.dto';
 
 @Injectable()
 export class ReplyChatsService {
@@ -204,7 +205,7 @@ export class ReplyChatsService {
     await this.chatsService.getChatEntity({ id: chatId }, ['replyChats']);
 
     // 존재하는 replyChat인지 확인
-    const replyChat = await this.getReplyChatEntity({ id: chatId }, null);
+    const replyChat = await this.getReplyChatEntity({ id: replyChatId }, null);
 
     await this.deleteReplyChatEntity(replyChat, null);
 

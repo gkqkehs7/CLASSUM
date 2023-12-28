@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository } from 'typeorm';
-import {
-  SpaceRoleEntity,
-  SpaceRoleType,
-} from '../../entities/spaceRole.entity';
+import { SpaceRoleType } from '../../entities/spaceRole.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import {
   CreateSpaceMemberDAO,
