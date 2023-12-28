@@ -1,9 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { ApiLogInterceptor } from './interceptor/api.log.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // api log interceptor
+  app.useGlobalInterceptors(new ApiLogInterceptor());
 
   // class-validator pipe
   app.useGlobalPipes(new ValidationPipe());
