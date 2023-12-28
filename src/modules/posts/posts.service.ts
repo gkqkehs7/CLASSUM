@@ -396,7 +396,6 @@ export class PostsService {
     const post = await this.getPostEntity({ id: postId }, [
       'chats',
       'chats.replyChats',
-      'images',
     ]);
 
     // 관리자인지 확인

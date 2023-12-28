@@ -205,7 +205,7 @@ export class ReplyChatsService {
     await this.chatsService.getChatEntity({ id: chatId }, ['replyChats']);
 
     // 존재하는 replyChat인지 확인
-    const replyChat = await this.getReplyChatEntity({ id: chatId }, null);
+    const replyChat = await this.getReplyChatEntity({ id: replyChatId }, null);
 
     await this.deleteReplyChatEntity(replyChat, null);
 
