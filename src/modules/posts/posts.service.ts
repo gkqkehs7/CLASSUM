@@ -8,10 +8,12 @@ import {
   CreatePostDAO,
   Post,
   PostWithChats,
+  UpdatePostDAO,
 } from '../../interfaces/posts.interfaces';
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
 import { AlarmsService } from '../alarms/alarms.service';
+import { UpdatePostRequestDto } from '../spaces/request.dto/update.post.request.dto';
 
 @Injectable()
 export class PostsService {
@@ -70,6 +72,27 @@ export class PostsService {
 
     if (!post) {
       throw new Error('존재하지 않는 post 입니다.');
+    }
+
+    return post;
+  }
+
+  async updatePostEntity(
+    post: PostEntity,
+    updatePostEntity: UpdatePostDAO,
+    queryRunner: QueryRunner,
+  ): Promise<PostEntity> {
+    const { title, content, anonymous, postType } = updatePostEntity;
+
+    post.title = title;
+    post.content = content;
+    post.anonymous = anonymous;
+    post.type = postType;
+
+    if (queryRunner) {
+      await queryRunner.manager.getRepository(PostEntity).save(post);
+    } else {
+      await this.postRepository.save(post);
     }
 
     return post;
@@ -160,14 +183,104 @@ export class PostsService {
       // user들에게 알람 전송
       await Promise.all(
         space.members.map((user) => {
-          this.alarmsService.createAlarmEntity(
-            {
-              userId: user.id,
-              spaceId: space.id,
-              content: '새로운 게시글입니다.',
-            },
-            queryRunner,
-          );
+          if (user.id !== userId) {
+            return this.alarmsService.createAlarmEntity(
+              {
+                userId: user.id,
+                spaceId: space.id,
+                content: '새로운 게시글입니다.',
+              },
+              queryRunner,
+            );
+          }
+        }),
+      );
+
+      await queryRunner.commitTransaction();
+
+      return { success: true };
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async updatePost(
+    userId: number,
+    spaceId: number,
+    postId: number,
+    postType: PostType,
+    updatePostRequestDto: UpdatePostRequestDto,
+  ): Promise<SuccessResponse> {
+    const { title, content, anonymous } = updatePostRequestDto;
+
+    // 존재하는 space인지 확인
+    const post = await this.getPostEntity({ id: postId }, null);
+
+    // 존재하는 space인지 확인
+    const space = await this.spacesService.getSpaceEntity({ id: spaceId }, [
+      'members',
+    ]);
+
+    // space member만 변경 가능
+    const isMember = await this.spaceMembersService.isMember(userId, spaceId);
+
+    if (!isMember) {
+      throw new Error('멤버만 글을 작성할 수 있습니다.');
+    }
+
+    // 공지글인 경우 관리자만 변경 가능
+    if (postType === PostType.NOTIFICATION) {
+      const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
+
+      if (!isAdmin) {
+        throw new Error('관리자만 공지글을 작성할 수 있습니다.');
+      }
+    }
+
+    // 익명인 경우 참여자만 변경 가능
+    if (anonymous) {
+      const isParticipate = await this.spaceMembersService.isParticipate(
+        userId,
+        spaceId,
+      );
+
+      if (!isParticipate) {
+        throw new Error('참여자만 게시글을 익명으로 작성할 수 있습니다.');
+      }
+    }
+
+    const queryRunner = await this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // postEntity 생성
+      await this.updatePostEntity(
+        post,
+        {
+          title: title,
+          content: content,
+          anonymous: anonymous,
+          postType: postType,
+        },
+        queryRunner,
+      );
+
+      // user들에게 알람 전송
+      await Promise.all(
+        space.members.map((user) => {
+          if (user.id !== userId) {
+            return this.alarmsService.createAlarmEntity(
+              {
+                userId: user.id,
+                spaceId: space.id,
+                content: '게시글이 수정되었습니다.',
+              },
+              queryRunner,
+            );
+          }
         }),
       );
 

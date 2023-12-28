@@ -177,6 +177,7 @@ export class SpacesService {
       'posts.chats.replyChats',
       'members',
       'spaceRoles',
+      'alarms',
     ]);
 
     // 관리자만 space 삭제 가능

@@ -1,7 +1,7 @@
 import { IsBoolean, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreatePostRequestDto {
+export class UpdatePostRequestDto {
   @ApiProperty({
     description: 'post 제목',
   })

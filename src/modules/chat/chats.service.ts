@@ -147,14 +147,16 @@ export class ChatsService {
       // user들에게 알람 전송
       await Promise.all(
         space.members.map((user) => {
-          this.alarmsService.createAlarmEntity(
-            {
-              userId: user.id,
-              spaceId: space.id,
-              content: '새로운 댓글입니다.',
-            },
-            queryRunner,
-          );
+          if (user.id !== userId) {
+            this.alarmsService.createAlarmEntity(
+              {
+                userId: user.id,
+                spaceId: space.id,
+                content: '새로운 댓글입니다.',
+              },
+              queryRunner,
+            );
+          }
         }),
       );
 
