@@ -9,6 +9,7 @@ import { ReplyChatEntity } from '../entities/replyChat.entity';
 import { SpaceEntity } from '../entities/space.entity';
 import { SpaceMemberEntity } from '../entities/spaceMember.entity';
 import { SpaceRoleEntity } from '../entities/spaceRole.entity';
+import { AlarmEntity } from '../entities/alarm.entity';
 
 @Injectable()
 export class TypeormConfigService implements TypeOrmOptionsFactory {
@@ -31,6 +32,7 @@ export class TypeormConfigService implements TypeOrmOptionsFactory {
         SpaceEntity,
         SpaceMemberEntity,
         SpaceRoleEntity,
+        AlarmEntity,
       ],
       synchronize: false,
     };

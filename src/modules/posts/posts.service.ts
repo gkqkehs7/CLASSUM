@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryRunner, Repository } from 'typeorm';
+import { Connection, QueryRunner, Repository } from 'typeorm';
 import { PostEntity, PostType } from '../../entities/post.entity';
 import { CreatePostRequestDto } from '../spaces/request.dto/create.post.request.dto';
 import { SuccessResponse } from '../../interfaces/common.interfaces';
@@ -11,15 +11,18 @@ import {
 } from '../../interfaces/posts.interfaces';
 import { SpacesService } from '../spaces/spaces.service';
 import { SpaceMembersService } from '../space.member/space.members.service';
+import { AlarmsService } from '../alarms/alarms.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(PostEntity)
     private postRepository: Repository<PostEntity>,
-    // @Inject(forwardRef(() => SpacesService))
+
     private readonly spacesService: SpacesService,
     private readonly spaceMembersService: SpaceMembersService,
+    private alarmsService: AlarmsService,
+    private readonly connection: Connection,
   ) {}
 
   /**
@@ -104,7 +107,9 @@ export class PostsService {
     const { title, content, anonymous } = createPostRequestDto;
 
     // 존재하는 space인지 확인
-    await this.spacesService.getSpaceEntity({ id: spaceId }, null);
+    const space = await this.spacesService.getSpaceEntity({ id: spaceId }, [
+      'members',
+    ]);
 
     // space member만 작성 가능
     const isMember = await this.spaceMembersService.isMember(userId, spaceId);
@@ -134,20 +139,46 @@ export class PostsService {
       }
     }
 
-    // postEntity 생성
-    await this.createPostEntity(
-      {
-        title: title,
-        content: content,
-        anonymous: anonymous,
-        postType: postType,
-        userId: userId,
-        spaceId: spaceId,
-      },
-      null,
-    );
+    const queryRunner = await this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    return { success: true };
+    try {
+      // postEntity 생성
+      await this.createPostEntity(
+        {
+          title: title,
+          content: content,
+          anonymous: anonymous,
+          postType: postType,
+          userId: userId,
+          spaceId: spaceId,
+        },
+        queryRunner,
+      );
+
+      // user들에게 알람 전송
+      await Promise.all(
+        space.members.map((user) => {
+          this.alarmsService.createAlarmEntity(
+            {
+              userId: user.id,
+              spaceId: space.id,
+              content: '새로운 게시글입니다.',
+            },
+            queryRunner,
+          );
+        }),
+      );
+
+      await queryRunner.commitTransaction();
+
+      return { success: true };
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   /**

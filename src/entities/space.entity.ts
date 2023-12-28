@@ -12,6 +12,7 @@ import { SpaceRoleEntity } from './spaceRole.entity';
 import { PostEntity } from './post.entity';
 import { UserEntity } from './user.entity';
 import { SpaceMemberEntity } from './spaceMember.entity';
+import { AlarmEntity } from './alarm.entity';
 
 @Entity({ name: 'Space' })
 export class SpaceEntity {
@@ -63,4 +64,10 @@ export class SpaceEntity {
     cascade: true,
   })
   spaceRoles: SpaceRoleEntity[];
+
+  // alarmEntity와의 관계
+  @OneToMany(() => AlarmEntity, (alarm) => alarm.space, {
+    cascade: true,
+  })
+  alarms: AlarmEntity[];
 }
