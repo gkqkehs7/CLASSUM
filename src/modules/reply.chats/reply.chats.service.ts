@@ -160,6 +160,7 @@ export class ReplyChatsService {
             return this.alarmsService.createAlarmEntity(
               {
                 userId: user.id,
+                postId: postId,
                 spaceId: space.id,
                 content: '새로운 댓글입니다.',
                 priority: 2,

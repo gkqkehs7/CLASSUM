@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { SpaceEntity } from './space.entity';
 import { UserEntity } from './user.entity';
+import { PostEntity } from './post.entity';
 
 @Entity({ name: 'Alarm' })
 export class AlarmEntity {
@@ -29,6 +30,10 @@ export class AlarmEntity {
   @Column('int', { name: 'userId', nullable: true })
   userId: number;
 
+  // postEntity 참조 id
+  @Column('int', { name: 'postId', nullable: true })
+  postId: number;
+
   // spaceEntity 참조 id
   @Column('int', { name: 'spaceId', nullable: true })
   spaceId: number;
@@ -43,7 +48,7 @@ export class AlarmEntity {
   deletedAt: Date | null;
 
   // userEntity와의 관계
-  @ManyToOne(() => UserEntity, (user) => user.chats, {
+  @ManyToOne(() => UserEntity, (user) => user.alarms, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
@@ -55,8 +60,21 @@ export class AlarmEntity {
   ])
   user: UserEntity;
 
+  // postEntity와의 관계
+  @ManyToOne(() => PostEntity, (post) => post.alarms, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn([
+    {
+      name: 'postId',
+      referencedColumnName: 'id',
+    },
+  ])
+  post: PostEntity;
+
   // spaceEntity와의 관계
-  @ManyToOne(() => SpaceEntity, (space) => space.posts, {
+  @ManyToOne(() => SpaceEntity, (space) => space.alarms, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
