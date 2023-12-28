@@ -14,6 +14,7 @@ import { ChatEntity } from './chat.entity';
 import { PostEntity } from './post.entity';
 import { SpaceMemberEntity } from './spaceMember.entity';
 import { SpaceEntity } from './space.entity';
+import { AlarmEntity } from './alarm.entity';
 
 @Entity({ name: 'User' })
 export class UserEntity {
@@ -86,4 +87,10 @@ export class UserEntity {
     cascade: true,
   })
   replyChats: ReplyChatEntity[];
+
+  // alarmEntity와의 관계
+  @OneToMany(() => AlarmEntity, (alarm) => alarm.user, {
+    cascade: true,
+  })
+  alarms: AlarmEntity[];
 }

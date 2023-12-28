@@ -13,9 +13,16 @@ interface CreatePostDAO {
   spaceId: number;
 }
 
+interface UpdatePostDAO {
+  title: string;
+  content: string;
+  anonymous: boolean;
+  postType: PostType;
+}
+
 interface PostWithChats extends Post {
   user: User | null;
   chats: ChatWithUser[];
 }
 
-export { Post, CreatePostDAO, PostWithChats };
+export { Post, CreatePostDAO, UpdatePostDAO, PostWithChats };

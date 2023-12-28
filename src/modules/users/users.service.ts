@@ -11,16 +11,14 @@ import { Space } from '../../interfaces/spaces.interfaces';
 import { Post } from '../../interfaces/posts.interfaces';
 import { Chat } from '../../interfaces/chats.interfaces';
 import { ReplyChat } from '../../interfaces/reply.chats.interfaces';
+import { AlarmEntity } from '../../entities/alarm.entity';
+import { Alarm } from '../../interfaces/alarm.interfaces';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-    private readonly spacesService: SpacesService,
-    private readonly postsService: PostsService,
-    private readonly chatsService: ChatsService,
-    private readonly replyChatsService: ReplyChatsService,
   ) {}
 
   /**
@@ -107,10 +105,6 @@ export class UsersService {
   async getMySpaces(userId: number): Promise<Space[]> {
     const user = await this.getUserEntity({ id: userId }, ['spaces']);
 
-    if (user.spaces.length === 0) {
-      return [];
-    }
-
     return user.spaces;
   }
 
@@ -120,10 +114,6 @@ export class UsersService {
    */
   async getMyPosts(userId: number): Promise<Post[]> {
     const user = await this.getUserEntity({ id: userId }, ['posts']);
-
-    if (user.posts.length === 0) {
-      return [];
-    }
 
     return user.posts;
   }
@@ -135,10 +125,6 @@ export class UsersService {
   async getMyChats(userId: number): Promise<Chat[]> {
     const user = await this.getUserEntity({ id: userId }, ['chats']);
 
-    if (user.chats.length === 0) {
-      return [];
-    }
-
     return user.chats;
   }
 
@@ -149,10 +135,40 @@ export class UsersService {
   async getMyReplyChats(userId: number): Promise<ReplyChat[]> {
     const user = await this.getUserEntity({ id: userId }, ['replyChats']);
 
-    if (user.replyChats.length === 0) {
-      return [];
+    return user.replyChats;
+  }
+
+  async getMyAlarms(userId: number): Promise<Alarm[]> {
+    const user = await this.getUserEntity({ id: userId }, ['spaces', 'alarms']);
+
+    const alarmsGroupedBySpace: { [spaceId: number]: Alarm[] } = {};
+
+    // space별로 알람 분리
+    user.alarms.forEach((alarm) => {
+      const spaceId = alarm.spaceId;
+
+      if (!alarmsGroupedBySpace[spaceId]) {
+        alarmsGroupedBySpace[spaceId] = [alarm];
+      } else {
+        alarmsGroupedBySpace[spaceId].push(alarm);
+      }
+    });
+
+    const spaceIds = Object.keys(alarmsGroupedBySpace);
+
+    const priorityAlarmGroupedBySpace: Alarm[] = [];
+
+    // 가장 우선순위가 높은 알람만 유저에게 보여주기기
+    for (const spaceId of spaceIds) {
+      const alarms = alarmsGroupedBySpace[spaceId];
+
+      const alarm = alarms.reduce((alarm, currentAlarm) => {
+        return currentAlarm.priority < alarm.priority ? currentAlarm : alarm;
+      }, alarms[0]);
+
+      priorityAlarmGroupedBySpace.push(alarm);
     }
 
-    return user.replyChats;
+    return priorityAlarmGroupedBySpace;
   }
 }

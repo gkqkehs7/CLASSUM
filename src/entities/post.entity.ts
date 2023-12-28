@@ -13,6 +13,7 @@ import { SpaceEntity } from './space.entity';
 import { ChatEntity } from './chat.entity';
 import { UserEntity } from './user.entity';
 import { PostImageEntity } from './postImage.entity';
+import { AlarmEntity } from './alarm.entity';
 
 export enum PostType {
   NOTIFICATION = 'notification',
@@ -98,4 +99,10 @@ export class PostEntity {
     cascade: true,
   })
   images: PostImageEntity[];
+
+  // alarmEntity와의 관계
+  @OneToMany(() => AlarmEntity, (alarm) => alarm.user, {
+    cascade: true,
+  })
+  alarms: AlarmEntity[];
 }

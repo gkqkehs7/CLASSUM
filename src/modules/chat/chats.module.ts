@@ -9,6 +9,7 @@ import { ChatEntity } from '../../entities/chat.entity';
 import { SpacesModule } from '../spaces/spaces.module';
 import { SpaceMembersModule } from '../space.member/space.members.module';
 import { PostsModule } from '../posts/posts.module';
+import { AlarmsModule } from '../alarms/alarms.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PostsModule } from '../posts/posts.module';
     PostsModule,
     forwardRef(() => SpacesModule),
     SpaceMembersModule,
+    AlarmsModule,
   ],
   exports: [ChatsService],
   providers: [ChatsService],

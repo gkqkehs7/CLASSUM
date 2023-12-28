@@ -27,6 +27,7 @@ import { ReplyChatsService } from '../reply.chats/reply.chats.service';
 import { CreateChatRequestDto } from './request.dto/create.chat.request.dto';
 import { CreateReplyChatRequestDto } from './request.dto/create.reply.chat.request.dto';
 import { GetPostResponseDto } from './response.dto/get.post.response.dto';
+import { UpdatePostRequestDto } from './request.dto/update.post.request.dto';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -157,6 +158,36 @@ export class SpacesController {
       parseInt(spaceId),
       query.postType,
       createPostRequestDto,
+    );
+
+    return new SuccessResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: 'post 업데이트',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Patch('/:spaceId/post/:postId')
+  async updatePost(
+    @Req() request,
+    @Param('spaceId') spaceId: string,
+    @Param('postId') postId: string,
+    @Query() query,
+    @Body() updatePostRequestDto: UpdatePostRequestDto,
+  ): Promise<SuccessResponseDto> {
+    if (
+      query.postType !== PostType.NOTIFICATION &&
+      query.postType !== PostType.QUESTION
+    ) {
+      throw new Error('잘못된 쿼리 형식입니다.');
+    }
+
+    const response = await this.postsService.updatePost(
+      parseInt(request.userId),
+      parseInt(spaceId),
+      parseInt(postId),
+      query.postType,
+      updatePostRequestDto,
     );
 
     return new SuccessResponseDto(response);

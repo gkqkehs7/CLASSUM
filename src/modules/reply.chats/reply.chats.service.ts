@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryRunner, Repository } from 'typeorm';
+import { Connection, QueryRunner, Repository } from 'typeorm';
 import { CreateReplyChatRequestDto } from '../spaces/request.dto/create.reply.chat.request.dto';
 import { ReplyChatEntity } from '../../entities/replyChat.entity';
 import { SuccessResponse } from '../../interfaces/common.interfaces';
@@ -12,6 +12,7 @@ import {
   CreateReplyChatDAO,
   ReplyChat,
 } from '../../interfaces/reply.chats.interfaces';
+import { AlarmsService } from '../alarms/alarms.service';
 
 @Injectable()
 export class ReplyChatsService {
@@ -22,6 +23,8 @@ export class ReplyChatsService {
     private readonly chatsService: ChatsService,
     private readonly spacesService: SpacesService,
     private readonly spaceMembersService: SpaceMembersService,
+    private alarmsService: AlarmsService,
+    private readonly connection: Connection,
   ) {}
 
   /**
@@ -107,7 +110,9 @@ export class ReplyChatsService {
     const { content, anonymous } = createReplyChatRequestDto;
 
     // 존재하는 space인지 확인
-    await this.spacesService.getSpaceEntity({ id: spaceId }, null);
+    const space = await this.spacesService.getSpaceEntity({ id: spaceId }, [
+      'members',
+    ]);
 
     // 존재하는 post인지 확인
     await this.postsService.getPostEntity({ id: postId }, null);
@@ -131,19 +136,47 @@ export class ReplyChatsService {
       }
     }
 
-    // replyChatEntity 생성
-    await this.createReplyChatEntity(
-      {
-        content: content,
-        anonymous: anonymous,
-        userId: userId,
-        postId: 1,
-        chatId: chatId,
-      },
-      null,
-    );
+    const queryRunner = await this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    return { success: true };
+    try {
+      // replyChatEntity 생성
+      await this.createReplyChatEntity(
+        {
+          content: content,
+          anonymous: anonymous,
+          userId: userId,
+          postId: 1,
+          chatId: chatId,
+        },
+        queryRunner,
+      );
+
+      // user들에게 알람 전송
+      await Promise.all(
+        space.members.map((user) => {
+          if (user.id !== userId) {
+            return this.alarmsService.createAlarmEntity(
+              {
+                userId: user.id,
+                postId: postId,
+                spaceId: space.id,
+                content: '새로운 댓글입니다.',
+                priority: 2,
+              },
+              queryRunner,
+            );
+          }
+        }),
+      );
+
+      return { success: true };
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   /**

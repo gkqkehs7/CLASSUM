@@ -6,6 +6,7 @@ import { PostsModule } from '../posts/posts.module';
 import { SpacesModule } from '../spaces/spaces.module';
 import { SpaceMembersModule } from '../space.member/space.members.module';
 import { ChatsModule } from '../chat/chats.module';
+import { AlarmsModule } from '../alarms/alarms.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ChatsModule } from '../chat/chats.module';
     ChatsModule,
     forwardRef(() => SpacesModule),
     SpaceMembersModule,
+    AlarmsModule,
   ],
   exports: [ReplyChatsService],
   providers: [ReplyChatsService],
