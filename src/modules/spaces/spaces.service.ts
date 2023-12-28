@@ -173,6 +173,9 @@ export class SpacesService {
     // 존재하는 space인지 확인
     const space = await this.getSpaceEntity({ id: spaceId }, [
       'posts',
+      'posts.chats',
+      'posts.chats.replyChats',
+      'members',
       'spaceRoles',
     ]);
 

@@ -96,7 +96,7 @@ class Chat {
     this.createdAt = obj.createdAt;
     this.updatedAt = obj.updatedAt;
     this.deletedAt = obj.deletedAt;
-    this.user = new User(obj.user);
+    this.user = obj.user === null ? null : new User(obj.user);
     this.replyChats = obj.replyChats.map(
       (replyChat) => new ReplyChat(replyChat),
     );
@@ -146,7 +146,7 @@ class ReplyChat {
     this.createdAt = obj.createdAt;
     this.updatedAt = obj.updatedAt;
     this.deletedAt = obj.deletedAt;
-    this.user = new User(obj.user);
+    this.user = obj.user === null ? null : new User(obj.user);
   }
 }
 
@@ -210,7 +210,7 @@ export class GetPostResponseDto {
     this.createdAt = obj.createdAt;
     this.updatedAt = obj.updatedAt;
     this.deletedAt = obj.deletedAt;
-    this.user = new User(obj.user);
+    this.user = obj.user === null ? null : new User(obj.user);
     this.chats = obj.chats.map((chat) => new Chat(chat));
   }
 }

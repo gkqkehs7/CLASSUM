@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository } from 'typeorm';
-import { SpaceRoleType } from '../../entities/spaceRole.entity';
+import {
+  SpaceRoleEntity,
+  SpaceRoleType,
+} from '../../entities/spaceRole.entity';
 import { SpaceMemberEntity } from '../../entities/spaceMember.entity';
 import {
   CreateSpaceMemberDAO,
   SpaceMember,
+  UpdateSpaceMemberDAO,
 } from '../../interfaces/space.members.interfaces';
 
 @Injectable()
@@ -30,6 +34,53 @@ export class SpaceMembersService {
 
     spaceMember.userId = userId;
     spaceMember.spaceId = spaceId;
+    spaceMember.roleName = roleName;
+    spaceMember.roleType = roleType;
+
+    if (queryRunner) {
+      await queryRunner.manager
+        .getRepository(SpaceMemberEntity)
+        .save(spaceMember);
+    } else {
+      await this.spaceMemberRepository.save(spaceMember);
+    }
+
+    return spaceMember;
+  }
+
+  /**
+   * spaceMemberEntity 가져오기
+   * @param userId
+   * @param spaceId
+   */
+  async getSpaceMemberEntity(
+    userId: number,
+    spaceId: number,
+  ): Promise<SpaceMemberEntity> {
+    const spaceMember = await this.spaceMemberRepository.findOne({
+      where: { userId: userId, spaceId: spaceId },
+    });
+
+    if (!spaceMember) {
+      throw new Error('존재하지 않는 member 입니다.');
+    }
+
+    return spaceMember;
+  }
+
+  /**
+   * spaceMemberEntity 업데이트
+   * @param spaceMember
+   * @param updateSpaceMemberDAO
+   * @param queryRunner
+   */
+  async updateSpaceMemberEntity(
+    spaceMember: SpaceMemberEntity,
+    updateSpaceMemberDAO: UpdateSpaceMemberDAO,
+    queryRunner: QueryRunner,
+  ): Promise<SpaceMemberEntity> {
+    const { roleName, roleType } = updateSpaceMemberDAO;
+
     spaceMember.roleName = roleName;
     spaceMember.roleType = roleType;
 

@@ -92,11 +92,12 @@ export class SpacesController {
     return new SuccessResponseDto(response);
   }
 
+  // spaceRoles
   @ApiOperation({
     summary: 'space roles 삭제',
   })
   @UseGuards(AccessTokenGuard)
-  @Patch('/:spaceId/roles')
+  @Delete('/:spaceId/roles')
   async deleteSpaceRole(
     @Req() request,
     @Param('spaceId') spaceId: string,
@@ -115,16 +116,16 @@ export class SpacesController {
     summary: '유저의 space role 변경',
   })
   @UseGuards(AccessTokenGuard)
-  @Patch('/:spaceId/users/:userId/roles')
+  @Patch('/:spaceId/members/:memberId/roles')
   async updateUserSpaceRole(
     @Req() request,
-    @Param('userId') userId: string,
+    @Param('memberId') memberId: string,
     @Param('spaceId') spaceId: string,
     @Body() updateUserSpaceRoleRequestDto: UpdateUserSpaceRoleRequestDto,
   ): Promise<SuccessResponseDto> {
     const response = await this.spaceRolesService.updateUserSpaceRole(
       parseInt(request.userId),
-      parseInt(userId),
+      parseInt(memberId),
       parseInt(spaceId),
       updateUserSpaceRoleRequestDto,
     );
