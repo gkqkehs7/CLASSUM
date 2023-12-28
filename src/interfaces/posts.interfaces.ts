@@ -7,6 +7,7 @@ interface Post extends PostEntity {}
 interface CreatePostDAO {
   title: string;
   content: string;
+  fileSrc: string;
   anonymous: boolean;
   postType: PostType;
   userId: number;
@@ -16,6 +17,7 @@ interface CreatePostDAO {
 interface UpdatePostDAO {
   title: string;
   content: string;
+  fileSrc: string;
   anonymous: boolean;
   postType: PostType;
 }

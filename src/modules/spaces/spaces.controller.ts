@@ -9,6 +9,7 @@ import {
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SpacesService } from './spaces.service';
@@ -28,6 +29,7 @@ import { CreateChatRequestDto } from './request.dto/create.chat.request.dto';
 import { CreateReplyChatRequestDto } from './request.dto/create.reply.chat.request.dto';
 import { GetPostResponseDto } from './response.dto/get.post.response.dto';
 import { UpdatePostRequestDto } from './request.dto/update.post.request.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('spaces')
 @Controller('spaces')
@@ -139,11 +141,12 @@ export class SpacesController {
     summary: 'post 생성',
   })
   @UseGuards(AccessTokenGuard)
+  @UseInterceptors(FileInterceptor('file'))
   @Post('/:spaceId/post')
   async createPost(
     @Req() request,
-    @Param('spaceId') spaceId: string,
     @Query() query,
+    @Param('spaceId') spaceId: string,
     @Body() createPostRequestDto: CreatePostRequestDto,
   ): Promise<SuccessResponseDto> {
     if (

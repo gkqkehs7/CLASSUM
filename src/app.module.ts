@@ -15,6 +15,7 @@ import { ChatsModule } from './modules/chat/chats.module';
 import { ReplyChatsModule } from './modules/reply.chats/reply.chats.module';
 import { SpaceMembersModule } from './modules/space.member/space.members.module';
 import { AlarmsModule } from './modules/alarms/alarms.module';
+import { FilesModule } from './modules/files/files.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { AlarmsModule } from './modules/alarms/alarms.module';
     ChatsModule,
     ReplyChatsModule,
     AlarmsModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -15,6 +15,12 @@ export class CreatePostRequestDto {
   readonly content: string;
 
   @ApiProperty({
+    description: 'post file 저장소 src',
+  })
+  @IsString()
+  readonly fileSrc: string;
+
+  @ApiProperty({
     description: '익명성 여부',
   })
   @IsBoolean()

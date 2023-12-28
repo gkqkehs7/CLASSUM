@@ -3,7 +3,6 @@ import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UserEntity } from '../entities/user.entity';
 import { PostEntity } from '../entities/post.entity';
-import { PostImageEntity } from '../entities/postImage.entity';
 import { ChatEntity } from '../entities/chat.entity';
 import { ReplyChatEntity } from '../entities/replyChat.entity';
 import { SpaceEntity } from '../entities/space.entity';
@@ -26,7 +25,6 @@ export class TypeormConfigService implements TypeOrmOptionsFactory {
       entities: [
         UserEntity,
         PostEntity,
-        PostImageEntity,
         ChatEntity,
         ReplyChatEntity,
         SpaceEntity,
