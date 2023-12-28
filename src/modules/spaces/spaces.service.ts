@@ -200,7 +200,7 @@ export class SpacesService {
     spaceId: number,
     entranceSpaceRequestDto: EntranceSpaceRequestDto,
   ): Promise<SuccessResponse> {
-    const { entranceCode } = entranceSpaceRequestDto;
+    const { entranceCode, roleName } = entranceSpaceRequestDto;
 
     // 존재하는 space인지 확인
     const space = await this.getSpaceEntity({ id: spaceId }, null);
@@ -212,13 +212,28 @@ export class SpacesService {
       throw new Error('잘못된 코드 입니다.');
     }
 
-    if (entranceCode === adminCode) {
-      // 관리자만 관리자 코드로 입장 가능
-      const isAdmin = await this.spaceMembersService.isAdmin(userId, spaceId);
-
-      if (!isAdmin) {
-        throw new Error('관리자만 관리자 코드로 입장 가능합니다.');
-      }
+    if (entranceCode === code) {
+      // 참여자로 참여
+      await this.spaceMembersService.createSpaceMemberEntity(
+        {
+          userId: userId,
+          spaceId: spaceId,
+          roleName: roleName,
+          roleType: SpaceRoleType.PARTICIPANT,
+        },
+        null,
+      );
+    } else if (entranceCode === adminCode) {
+      // 관리자로 참여
+      await this.spaceMembersService.createSpaceMemberEntity(
+        {
+          userId: userId,
+          spaceId: spaceId,
+          roleName: roleName,
+          roleType: SpaceRoleType.ADMIN,
+        },
+        null,
+      );
     }
 
     return { success: true };

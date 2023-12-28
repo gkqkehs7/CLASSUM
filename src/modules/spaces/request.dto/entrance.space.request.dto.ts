@@ -7,4 +7,10 @@ export class EntranceSpaceRequestDto {
   })
   @IsString()
   readonly entranceCode: string;
+
+  @ApiProperty({
+    description: '입장 역할 이름',
+  })
+  @IsString()
+  readonly roleName: string;
 }
