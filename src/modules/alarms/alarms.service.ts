@@ -15,12 +15,13 @@ export class AlarmsService {
     createAlarmDAO: CreateAlarmDAO,
     queryRunner: QueryRunner,
   ): Promise<AlarmEntity> {
-    const { userId, spaceId, content } = createAlarmDAO;
+    const { userId, spaceId, content, priority } = createAlarmDAO;
 
     const alarm = new AlarmEntity();
     alarm.userId = userId;
     alarm.spaceId = spaceId;
     alarm.content = content;
+    alarm.priority = priority;
 
     if (queryRunner) {
       await queryRunner.manager.getRepository(AlarmEntity).save(alarm);
@@ -30,4 +31,6 @@ export class AlarmsService {
 
     return alarm;
   }
+
+  // async checkAlarm() {}
 }

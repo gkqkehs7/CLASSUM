@@ -8,6 +8,7 @@ import { GetMySpacesResponseDto } from './dto/get.my.spaces.response.dto';
 import { GetMyPostsResponseDto } from './dto/get.my.posts.response.dto';
 import { GetMyChatsResponseDto } from './dto/get.my.chats.response.dto';
 import { GetMyReplyChatsResponseDto } from './dto/get.my.reply.chats.response.dto';
+import { GetMyAlarmsResponseDto } from './dto/get.my.alarms.response.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -84,5 +85,16 @@ export class UsersController {
     const response = await this.usersService.getMyReplyChats(request.userId);
 
     return new GetMyReplyChatsResponseDto(response);
+  }
+
+  @ApiOperation({
+    summary: '내 알람들 가져오',
+  })
+  @UseGuards(AccessTokenGuard)
+  @Get('/me/alarms')
+  async getMyAlarms(@Req() request): Promise<GetMyAlarmsResponseDto> {
+    const response = await this.usersService.getMyAlarms(request.userId);
+
+    return new GetMyAlarmsResponseDto(response);
   }
 }

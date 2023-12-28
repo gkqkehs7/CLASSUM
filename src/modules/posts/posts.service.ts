@@ -189,6 +189,7 @@ export class PostsService {
                 userId: user.id,
                 spaceId: space.id,
                 content: '새로운 게시글입니다.',
+                priority: 0,
               },
               queryRunner,
             );
@@ -277,6 +278,7 @@ export class PostsService {
                 userId: user.id,
                 spaceId: space.id,
                 content: '게시글이 수정되었습니다.',
+                priority: 1,
               },
               queryRunner,
             );

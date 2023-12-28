@@ -153,6 +153,7 @@ export class ChatsService {
                 userId: user.id,
                 spaceId: space.id,
                 content: '새로운 댓글입니다.',
+                priority: 2,
               },
               queryRunner,
             );

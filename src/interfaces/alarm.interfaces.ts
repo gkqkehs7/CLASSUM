@@ -6,6 +6,7 @@ interface CreateAlarmDAO {
   content: string;
   userId: number;
   spaceId: number;
+  priority: number;
 }
 
 export { Alarm, CreateAlarmDAO };

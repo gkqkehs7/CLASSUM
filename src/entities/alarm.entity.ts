@@ -21,6 +21,10 @@ export class AlarmEntity {
   @Column('varchar')
   content: string;
 
+  // alarm 우선순위
+  @Column('int')
+  priority: number;
+
   // userEntity 참조 id
   @Column('int', { name: 'userId', nullable: true })
   userId: number;
