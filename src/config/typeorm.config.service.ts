@@ -32,7 +32,7 @@ export class TypeormConfigService implements TypeOrmOptionsFactory {
         SpaceRoleEntity,
         AlarmEntity,
       ],
-      synchronize: false,
+      synchronize: true,
     };
   }
 }
