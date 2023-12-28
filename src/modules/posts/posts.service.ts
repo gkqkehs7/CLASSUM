@@ -36,12 +36,13 @@ export class PostsService {
     createPostDAO: CreatePostDAO,
     queryRunner: QueryRunner,
   ): Promise<Post> {
-    const { title, content, anonymous, postType, userId, spaceId } =
+    const { title, content, fileSrc, anonymous, postType, userId, spaceId } =
       createPostDAO;
 
     const post = new PostEntity();
     post.title = title;
     post.content = content;
+    post.fileSrc = fileSrc;
     post.anonymous = anonymous;
     post.type = postType;
     post.userId = userId;
@@ -77,15 +78,22 @@ export class PostsService {
     return post;
   }
 
+  /**
+   * postEntity 업데이트
+   * @param post
+   * @param updatePostEntity
+   * @param queryRunner
+   */
   async updatePostEntity(
     post: PostEntity,
     updatePostEntity: UpdatePostDAO,
     queryRunner: QueryRunner,
   ): Promise<PostEntity> {
-    const { title, content, anonymous, postType } = updatePostEntity;
+    const { title, content, fileSrc, anonymous, postType } = updatePostEntity;
 
     post.title = title;
     post.content = content;
+    post.fileSrc = fileSrc;
     post.anonymous = anonymous;
     post.type = postType;
 
@@ -127,7 +135,7 @@ export class PostsService {
     postType: PostType,
     createPostRequestDto: CreatePostRequestDto,
   ): Promise<SuccessResponse> {
-    const { title, content, anonymous } = createPostRequestDto;
+    const { title, content, fileSrc, anonymous } = createPostRequestDto;
 
     // 존재하는 space인지 확인
     const space = await this.spacesService.getSpaceEntity({ id: spaceId }, [
@@ -172,6 +180,7 @@ export class PostsService {
         {
           title: title,
           content: content,
+          fileSrc: fileSrc,
           anonymous: anonymous,
           postType: postType,
           userId: userId,
@@ -285,7 +294,7 @@ export class PostsService {
     postType: PostType,
     updatePostRequestDto: UpdatePostRequestDto,
   ): Promise<SuccessResponse> {
-    const { title, content, anonymous } = updatePostRequestDto;
+    const { title, content, fileSrc, anonymous } = updatePostRequestDto;
 
     // 존재하는 space인지 확인
     const post = await this.getPostEntity({ id: postId }, null);
@@ -334,6 +343,7 @@ export class PostsService {
         {
           title: title,
           content: content,
+          fileSrc: fileSrc,
           anonymous: anonymous,
           postType: postType,
         },

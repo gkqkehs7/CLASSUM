@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PostType } from '../../../entities/post.entity';
+import { IsString } from 'class-validator';
 
 class User {
   @ApiProperty({
@@ -167,6 +168,12 @@ export class GetPostResponseDto {
   public content: string;
 
   @ApiProperty({
+    description: 'post file 저장소 src',
+  })
+  @IsString()
+  readonly fileSrc: string;
+
+  @ApiProperty({
     description: 'post type',
   })
   public type: PostType;
@@ -205,6 +212,7 @@ export class GetPostResponseDto {
     this.id = obj.id;
     this.title = obj.title;
     this.content = obj.content;
+    this.fileSrc = obj.fileSrc;
     this.type = obj.type;
     this.anonymous = obj.anonymous;
     this.createdAt = obj.createdAt;

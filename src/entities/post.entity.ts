@@ -12,7 +12,6 @@ import {
 import { SpaceEntity } from './space.entity';
 import { ChatEntity } from './chat.entity';
 import { UserEntity } from './user.entity';
-import { PostImageEntity } from './postImage.entity';
 import { AlarmEntity } from './alarm.entity';
 
 export enum PostType {
@@ -33,6 +32,10 @@ export class PostEntity {
   // post 내용
   @Column('text')
   content: string;
+
+  // file 저장소 src
+  @Column('text')
+  fileSrc: string;
 
   // post 게시글 타입
   @Column({
@@ -93,12 +96,6 @@ export class PostEntity {
     cascade: true,
   })
   chats: ChatEntity[];
-
-  // chatEntity와의 관계
-  @OneToMany(() => PostImageEntity, (postImage) => postImage.post, {
-    cascade: true,
-  })
-  images: PostImageEntity[];
 
   // alarmEntity와의 관계
   @OneToMany(() => AlarmEntity, (alarm) => alarm.user, {
